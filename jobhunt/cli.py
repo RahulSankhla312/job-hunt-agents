@@ -178,7 +178,7 @@ def doctor(
 
         p = settings().profile_path
         if not p.exists():
-            return False, "not created yet - open the dashboard (python run.py web)"
+            return False, "not created yet - open the dashboard (hireloop web)"
         return True, str(p)
 
     check("master profile", _profile)

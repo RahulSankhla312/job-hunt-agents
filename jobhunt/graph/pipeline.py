@@ -69,8 +69,8 @@ def exclusive(label: str) -> Iterator[None]:
 def _require_profile() -> None:
     if not profile_exists():
         raise ProfileMissing(
-            "no profile yet - finish setup in the dashboard (run.py web) "
-            "or run: python run.py onboard"
+            "no profile yet - finish setup in the dashboard (hireloop web) "
+            "or run: hireloop onboard"
         )
 
 

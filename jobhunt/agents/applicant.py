@@ -1648,7 +1648,7 @@ def handover(job_id: int, *, timeout_s: int = HANDOVER_TIMEOUT_S) -> HandoverRes
             "could not open a visible browser window "
             f"({str(exc).splitlines()[0][:80]}). Install Google Chrome or "
             "Microsoft Edge, and make sure the dashboard runs in your own "
-            f"desktop session (or run: python run.py handover --job-id {job_id})"
+            f"desktop session (or run: hireloop handover --job-id {job_id})"
         )
         log.error(result.detail)
         return result
