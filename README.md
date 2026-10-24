@@ -1,4 +1,6 @@
-# HireLoop
+<p align="center"><img src="docs/logo.svg" width="88" alt="HireLoop logo"></p>
+
+<h1 align="center">HireLoop</h1>
 
 [![CI](https://github.com/RahulSankhla312/hireloop/actions/workflows/ci.yml/badge.svg)](https://github.com/RahulSankhla312/hireloop/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)

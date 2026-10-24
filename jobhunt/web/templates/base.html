@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{% block title %}Dashboard{% endblock %} · HireLoop</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='24' cy='32' r='13' fill='none' stroke='%233740e0' stroke-width='6'/%3E%3Ccircle cx='40' cy='32' r='13' fill='none' stroke='%239aa0ff' stroke-width='6'/%3E%3Ccircle cx='52' cy='14' r='4.5' fill='%23ffb547'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
      white sidebar, indigo #3444DA, and its signature card construction - a
      white 8px panel inside a 4px lavender #E1E3F9 frame. */
   :root {
-    --brand: #3444da; --brand-press: #2a35ae;
+    --brand: #3444da; --brand-press: #2a35ae; --brand-soft-ring: #9aa0ff;
     --lav: #e1e3f9; --lav-soft: #eef0fe;
     --bg: #f5f4f8; --surface: #ffffff; --surface-2: #f5f4f8;
     --ink: #2a2b2f; --ink-2: #55555e; --muted: #5c5b67;
@@ -24,7 +25,7 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --brand: #9aa2ff; --brand-press: #b3b9ff;
+      --brand: #9aa2ff; --brand-press: #b3b9ff; --brand-soft-ring: #c3c6ff;
       --lav: #262a42; --lav-soft: #1d2033;
       --bg: #0f1116; --surface: #171a22; --surface-2: #1d212b;
       --ink: #eceef4; --ink-2: #b4bac7; --muted: #8e94a3;
@@ -56,6 +57,10 @@
     text-decoration: none; padding: 0 10px; margin-bottom: 28px; display: block;
   }
   .wordmark i { color: var(--brand); font-style: normal; }
+  .wordmark { display: flex; align-items: center; gap: 9px; }
+  .wordmark svg { width: 30px; height: 30px; flex: none; }
+  .wordmark .ring-a { stroke: var(--brand); }
+  .wordmark .ring-b { stroke: var(--brand-soft-ring, #9aa0ff); }
   .side nav { display: flex; flex-direction: column; gap: 2px; }
   .side nav a {
     display: flex; align-items: center; gap: 11px; text-decoration: none;
@@ -404,7 +409,7 @@
 <body>
 <div class="shell">
   <aside class="side">
-    <a class="wordmark" href="/">hireloop<i>.</i></a>
+    <a class="wordmark" href="/" aria-label="HireLoop home"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring-a" cx="24" cy="32" r="13" fill="none" stroke-width="6"/><circle class="ring-b" cx="40" cy="32" r="13" fill="none" stroke-width="6"/><circle cx="52" cy="14" r="4.5" fill="#ffb547"/></svg><span>hireloop<i>.</i></span></a>
     <nav>
       {% set path = request.url.path %}
       {% if setup_done %}

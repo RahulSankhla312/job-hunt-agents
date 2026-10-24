@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" role="img" aria-label="HireLoop">
+  <style>
+    .w { font: 700 38px "Outfit", "Segoe UI", system-ui, sans-serif; letter-spacing: -1px; fill: #1d1b26; }
+    .d { fill: #3740e0; }
+    @media (prefers-color-scheme: dark) { .w { fill: #f1f0f6; } .d { fill: #9aa0ff; } }
+  </style>
+  <circle cx="24" cy="32" r="13" fill="none" stroke="#3740e0" stroke-width="6"/>
+  <circle cx="40" cy="32" r="13" fill="none" stroke="#9aa0ff" stroke-width="6"/>
+  <circle cx="52" cy="14" r="4.5" fill="#ffb547"/>
+  <text class="w" x="68" y="45">hireloop<tspan class="d">.</tspan></text>
+</svg>
