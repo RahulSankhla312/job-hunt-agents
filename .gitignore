@@ -1,0 +1,41 @@
+# secrets - never commit
+.env
+.env.*
+!.env.example
+*credentials*.json
+*token*.json
+client_secret*.json
+
+# local state / personal data (profile, database, resumes, browser session, logs)
+data/
+!data/.gitkeep
+demo-data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.log
+
+# generated artifacts
+*.pdf
+!tests/fixtures/*.pdf
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# os / editor
+Thumbs.db
+.DS_Store
+.idea/
+.claude/

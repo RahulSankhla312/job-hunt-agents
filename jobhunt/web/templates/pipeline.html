@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Pipeline{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Pipeline</h1>
+    <p>Every job by the state it is in, so you can see where the funnel stalls.</p>
+  </div>
+</div>
+
+<div class="tabs">
+  {% for s in statuses %}
+    <a href="/pipeline?status={{ s }}" class="{% if s == current %}on{% endif %}">{{ s.replace("_", " ") }}</a>
+  {% endfor %}
+</div>
+
+<div class="table-wrap scroll">
+<table>
+  <thead><tr>
+    <th>score</th><th>company</th><th>title</th><th>location</th><th>band</th><th>eligibility</th>
+  </tr></thead>
+  <tbody>
+  {% for row in rows %}
+  {% set job = row.job %}
+  <tr>
+    <td>{% if job.score %}<span class="score {% if job.score < threshold + 0.25 %}mid{% endif %}">{{ "%.2f"|format(job.score) }}</span>{% else %}—{% endif %}</td>
+    <td>{{ job.company }}</td>
+    <td><a href="/job/{{ job.id }}">{{ job.title }}</a></td>
+    <td>{{ (job.location or "")[:30] }}</td>
+    <td>{{ job.level_band.value }}</td>
+    <td>{{ job.eligibility.value.replace("_", " ") }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" style="color:var(--muted);padding:28px;text-align:center">Nothing in this state.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}

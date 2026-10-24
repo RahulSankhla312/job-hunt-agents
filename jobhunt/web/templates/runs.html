@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Runs{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Runs</h1>
+    <p>Start a run now, or let the daily schedule do it. One run at a time; each step is recorded, and a step that fails does not stop the rest.</p>
+  </div>
+</div>
+
+{% if welcome %}
+<ol class="steps" aria-label="Setup progress">
+  <li class="done">&#10003; Your profile</li><li class="done">&#10003; Job filters</li>
+  <li class="done">&#10003; Connections</li><li class="on" aria-current="step">4. Start</li>
+</ol>
+<div class="notice">You're set up. Press <b>Find &amp; prepare jobs</b> to run your first search — results appear in your
+  <a href="/">Queue</a> as each step finishes.</div>
+{% endif %}
+{% include "_messages.html" %}
+
+{% if ai_status.ok is sameas false or not ai.configured %}
+<div class="errors" style="padding-left:14px">
+  <b style="color:var(--bad)">The AI engine is not working yet.</b>
+  Sourcing and filtering still run, but scoring, resumes and letters need it.
+  Fix it on <a href="/connections">Connections</a>.
+</div>
+{% endif %}
+
+<div class="frame section" id="current"><div class="panel">
+  {% if busy %}
+    <div class="card-top">
+      <span class="state busy"><span class="dot-live"></span>Running</span>
+      <b>{{ state.label }}</b>
+      <span class="meta">started {{ state.started_at|localtime }} · <span id="elapsed">{{ state.elapsed_s|duration }}</span></span>
+    </div>
+    <p class="summary">Current step: <b id="stage">{{ state.stage or "starting" }}</b>. You can leave this page — the run continues in the background.</p>
+  {% elif last %}
+    <div class="card-top">
+      <span class="state {{ 'ok' if last.ok else 'bad' }}">{{ "Finished" if last.ok else "Needs attention" }}</span>
+      <b>{{ last.label }}</b>
+      <span class="meta">{{ last.finished_at|localtime }} · took {{ last.elapsed_s|duration }}</span>
+    </div>
+    <p class="summary">{{ last.message }}{% if last.ok %} — see your <a href="/">Queue</a>.{% endif %}</p>
+  {% elif history %}
+    {% set r = history[0].row %}
+    <div class="card-top">
+      <span class="state {{ 'ok' if r.ok else 'bad' }}">{{ "Finished" if r.ok else "Finished with errors" }}</span>
+      <b>{{ runs.get(r.run_type, r.run_type) }}</b>
+      <span class="meta">last run {{ r.started_at|localtime }}</span>
+    </div>
+    <p class="summary">See the history below{% if r.ok %}, and your <a href="/">Queue</a>{% endif %}.</p>
+  {% else %}
+    <p class="summary" style="margin:0">No runs yet. Start one below.</p>
+  {% endif %}
+</div></div>
+
+<div class="grid2">
+  {% for key, label in runs.items() %}
+  <div class="frame"><div class="panel">
+    <h2 style="margin:0 0 6px">{{ label }}</h2>
+    <p class="summary" style="margin-top:0">{{ run_help[key] }}</p>
+    <form method="post" action="/runs/start" class="actions">
+      <input type="hidden" name="which" value="{{ key }}">
+      <button type="submit" class="{{ 'primary' if key == 'morning' else '' }}" {% if busy %}disabled{% endif %}>
+        {% if key == "morning" %}Find jobs now{% elif key == "evening" %}Apply now{% elif key == "refresh" %}Rebuild now{% else %}Re-apply now{% endif %}</button>
+      {% if key == "refresh" %}<span class="meta">{% if outdated %}<b style="color:var(--bad)">{{ outdated }} outdated</b>{% else %}All resumes are current.{% endif %}</span>{% endif %}
+      {% if key == "evening" and shadow_mode %}<span class="meta">Practice mode: forms are filled, nothing is submitted.</span>{% endif %}
+    </form>
+  </div></div>
+  {% endfor %}
+
+  <div class="frame"><div class="panel">
+    <div class="card-top"><h2 style="margin:0">Daily schedule</h2><span class="grow"></span>
+      {% if scheduler_on %}<span class="state ok">On</span>{% else %}<span class="state idle">Off</span>{% endif %}</div>
+    <p class="summary" style="margin-top:0">Morning run at <b>{{ morning_at }}</b>, evening run at <b>{{ evening_at }}</b> ({{ tz }}).
+      Runs while this dashboard is running. <a href="/filters#schedule">Change times</a></p>
+    {% if next_runs %}
+    <dl class="kv">{% for label, when in next_runs %}<dt>Next</dt><dd>{{ label }} — {{ when|localtime("%a %d %b %H:%M") }}</dd>{% endfor %}</dl>
+    {% endif %}
+    <form method="post" action="/runs/scheduler" class="actions">
+      {% if scheduler_on %}
+        <input type="hidden" name="enabled" value="0"><button type="submit">Turn off</button>
+      {% else %}
+        <input type="hidden" name="enabled" value="1"><button type="submit" class="primary">Turn on</button>
+      {% endif %}
+    </form>
+  </div></div>
+</div>
+
+<h2>History <span class="count">{{ history|length }}</span></h2>
+{% if history %}
+<div class="table-wrap scroll">
+<table>
+  <thead><tr><th>Started</th><th>Run</th><th>Took</th><th>Result</th><th>Steps</th></tr></thead>
+  <tbody>
+  {% for h in history %}
+    {% set r = h.row %}
+    <tr>
+      <td style="white-space:nowrap">{{ r.started_at|localtime }}</td>
+      <td>{{ runs.get(r.run_type, r.run_type) }}</td>
+      <td style="white-space:nowrap">{% if r.finished_at %}{{ (r.finished_at - r.started_at).total_seconds()|duration }}{% else %}—{% endif %}</td>
+      <td>{% if r.ok %}<span class="state ok">ok</span>{% else %}<span class="state bad">errors</span>{% endif %}</td>
+      <td class="meta" style="margin:0">
+        {% for stage, text in h.summary %}<div><b>{{ stage }}</b>: {{ text }}</div>{% endfor %}
+        {% if r.error %}<div style="color:var(--bad)">{{ r.error[:300] }}</div>{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="empty">No runs yet.</div>
+{% endif %}
+
+{% if busy %}
+<script>
+  // Follow the run live; reload once it has finished to show the result.
+  (function poll() {
+    fetch("/runs/status").then(r => r.json()).then(s => {
+      if (!s.running) { location.reload(); return; }
+      const stage = document.getElementById("stage");
+      if (stage && s.stage) stage.textContent = s.stage;
+      const el = document.getElementById("elapsed");
+      if (el && s.elapsed != null) {
+        const m = Math.floor(s.elapsed / 60), sec = s.elapsed % 60;
+        el.textContent = m ? `${m}m ${String(sec).padStart(2, "0")}s` : `${sec}s`;
+      }
+      setTimeout(poll, 3000);
+    }).catch(() => setTimeout(poll, 5000));
+  })();
+</script>
+{% endif %}
+{% endblock %}

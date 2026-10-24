@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Hunt Agents</title>
+<meta name="description" content="A local team of AI agents that finds, filters, scores and applies to jobs for you, from a dashboard in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f3f8; --card: #ffffff; --ink: #1d1b26; --muted: #5d5a6b;
+    --line: #e2e0ec; --accent: #3740e0; --accent-ink: #ffffff; --code: #1d1b26; --code-ink: #f4f3f8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14131a; --card: #1d1c25; --ink: #f1f0f6; --muted: #a6a3b5;
+      --line: #2e2c3a; --accent: #7b82ff; --accent-ink: #0d0c14; --code: #0d0c14; --code-ink: #e6e5ee;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14131a; --card: #1d1c25; --ink: #f1f0f6; --muted: #a6a3b5;
+    --line: #2e2c3a; --accent: #7b82ff; --accent-ink: #0d0c14; --code: #0d0c14; --code-ink: #e6e5ee;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 Outfit, system-ui, sans-serif; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 56px 0 24px; }
+  .logo { font-weight: 700; font-size: 22px; }
+  .logo span { color: var(--accent); }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.1; margin: 28px 0 14px; letter-spacing: -0.02em; }
+  .lede { color: var(--muted); font-size: 19px; max-width: 680px; margin: 0; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 8px; }
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 999px; text-decoration: none; font-weight: 600; border: 1px solid var(--line); color: var(--ink); background: var(--card); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .shot { margin: 32px 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 12px 40px rgba(20, 18, 40, .12); }
+  .shot img { display: block; width: 100%; height: auto; }
+  h2 { font-size: 28px; margin: 56px 0 16px; letter-spacing: -0.01em; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  ol.steps { padding-left: 22px; }
+  ol.steps li { margin-bottom: 14px; }
+  pre { background: var(--code); color: var(--code-ink); padding: 16px; border-radius: 12px; overflow-x: auto; font-size: 14.5px; line-height: 1.5; margin: 8px 0 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .pair figure { margin: 0; }
+  .pair img { width: 100%; border-radius: 12px; border: 1px solid var(--line); }
+  figcaption { color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+  footer { color: var(--muted); font-size: 14.5px; padding: 48px 0; border-top: 1px solid var(--line); margin-top: 64px; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">jobhunt<span>.</span></div>
+    <h1>A team of AI agents that runs your job search, on your own computer.</h1>
+    <p class="lede">It finds openings on 170+ company career boards and LinkedIn, filters them by your rules,
+      scores each one for fit, tailors a fact-checked resume, and fills in application forms.
+      You approve everything from a dashboard in your browser.</p>
+    <div class="ctas">
+      <a class="btn primary" href="https://github.com/RahulSankhla312/job-hunt-agents#install">Get started</a>
+      <a class="btn" href="https://github.com/RahulSankhla312/job-hunt-agents">View on GitHub</a>
+    </div>
+  </header>
+
+  <div class="shot"><img src="screenshots/queue.png" alt="The Queue: scored jobs waiting for your decision"></div>
+
+  <h2>What it does</h2>
+  <div class="grid">
+    <div class="card"><h3>Finds jobs</h3><p>Greenhouse, Ashby, Lever, Workday, SmartRecruiters and Amazon boards, plus LinkedIn and Wellfound public listings.</p></div>
+    <div class="card"><h3>Filters for free</h3><p>Pay floor, titles, level, location and years asked are checked by rules before any AI call.</p></div>
+    <div class="card"><h3>Scores fit</h3><p>Each job gets a 1–5 score with the reasons: skills, level, pay confidence, eligibility.</p></div>
+    <div class="card"><h3>Applies with you</h3><p>Tailored or unchanged resume, filled forms, screenshots. Practice mode never submits on its own.</p></div>
+  </div>
+
+  <h2>Get started in three steps</h2>
+  <ol class="steps">
+    <li><b>Install</b> (Python 3.11+):
+<pre><code>git clone https://github.com/RahulSankhla312/job-hunt-agents.git
+cd job-hunt-agents
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt   # Windows: .venv\Scripts\python
+.venv/bin/python -m playwright install chromium</code></pre></li>
+    <li><b>Try the demo</b> with a made-up candidate and sample jobs, nothing to fill in:
+<pre><code>.venv/bin/python run.py demo</code></pre></li>
+    <li><b>Use it for real.</b> Start the dashboard, upload your resume once, set your filters, connect the AI engine (Claude Code or an Anthropic API key), and press <i>Find jobs now</i>:
+<pre><code>.venv/bin/python run.py web</code></pre></li>
+  </ol>
+
+  <h2>A closer look</h2>
+  <div class="pair">
+    <figure><img src="screenshots/job.png" alt="Job detail with score breakdown"><figcaption>Every score explained.</figcaption></figure>
+    <figure><img src="screenshots/applied.png" alt="Applied jobs"><figcaption>Every application and where it stands.</figcaption></figure>
+    <figure><img src="screenshots/filters.png" alt="Job filters"><figcaption>All settings from the UI.</figcaption></figure>
+    <figure><img src="screenshots/setup.png" alt="Profile setup"><figcaption>Fill your profile once.</figcaption></figure>
+  </div>
+
+  <footer>
+    Your profile, resume, applications and sessions stay on your machine. The screenshots use made-up people and companies.
+    MIT licensed · <a href="https://github.com/RahulSankhla312/job-hunt-agents">github.com/RahulSankhla312/job-hunt-agents</a>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}{% if onboarding %}Set up{% else %}Profile{% endif %}{% endblock %}
+{% block body %}
+
+{% macro exp_entry(i, e) -%}
+<div class="entry">
+  <div class="entry-head"><b>Job</b><button type="button" class="danger" onclick="removeEntry(this)">Remove</button></div>
+  <div class="fields">
+    <div class="field"><label for="exp-{{ i }}-title">Job title <span class="req">*</span></label>
+      <input type="text" id="exp-{{ i }}-title" name="exp-{{ i }}-title" value="{{ e.title if e else '' }}" placeholder="Software Engineer"></div>
+    <div class="field"><label for="exp-{{ i }}-company">Company <span class="req">*</span></label>
+      <input type="text" id="exp-{{ i }}-company" name="exp-{{ i }}-company" value="{{ e.company if e else '' }}"></div>
+    <div class="field"><label for="exp-{{ i }}-location">Location</label>
+      <input type="text" id="exp-{{ i }}-location" name="exp-{{ i }}-location" value="{{ e.location if e else '' }}" placeholder="Pune, India"></div>
+    <div class="field"><label for="exp-{{ i }}-start">Start</label>
+      <input type="text" id="exp-{{ i }}-start" name="exp-{{ i }}-start" value="{{ e.start if e else '' }}" placeholder="July 2023"></div>
+    <div class="field"><label for="exp-{{ i }}-end">End</label>
+      <input type="text" id="exp-{{ i }}-end" name="exp-{{ i }}-end" value="{{ e.end if e else '' }}" placeholder="Present"></div>
+    <div class="field wide"><label for="exp-{{ i }}-bullets">What you did — one achievement per line</label>
+      <textarea id="exp-{{ i }}-bullets" name="exp-{{ i }}-bullets" rows="4" placeholder="Built ... which cut ... by 40%">{{ e.bullets|join("\n") if e else '' }}</textarea>
+      <div class="hint">Tailored resumes may only reorder and rephrase these lines — they never add claims you did not write here.</div></div>
+    <div class="field wide"><label for="exp-{{ i }}-tech">Technologies used (comma separated)</label>
+      <input type="text" id="exp-{{ i }}-tech" name="exp-{{ i }}-tech" value="{{ e.tech|join(', ') if e else '' }}" placeholder="Python, PostgreSQL, AWS"></div>
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro edu_entry(i, e) -%}
+<div class="entry">
+  <div class="entry-head"><b>Education</b><button type="button" class="danger" onclick="removeEntry(this)">Remove</button></div>
+  <div class="fields">
+    <div class="field"><label for="edu-{{ i }}-institution">Institution <span class="req">*</span></label>
+      <input type="text" id="edu-{{ i }}-institution" name="edu-{{ i }}-institution" value="{{ e.institution if e else '' }}"></div>
+    <div class="field"><label for="edu-{{ i }}-degree">Degree</label>
+      <input type="text" id="edu-{{ i }}-degree" name="edu-{{ i }}-degree" value="{{ e.degree if e else '' }}" placeholder="B.Tech"></div>
+    <div class="field"><label for="edu-{{ i }}-field">Field of study</label>
+      <input type="text" id="edu-{{ i }}-field" name="edu-{{ i }}-field" value="{{ e.field if e else '' }}" placeholder="Computer Science"></div>
+    <div class="field"><label for="edu-{{ i }}-start">Start</label>
+      <input type="text" id="edu-{{ i }}-start" name="edu-{{ i }}-start" value="{{ e.start if e else '' }}" placeholder="2019"></div>
+    <div class="field"><label for="edu-{{ i }}-end">End</label>
+      <input type="text" id="edu-{{ i }}-end" name="edu-{{ i }}-end" value="{{ e.end if e else '' }}" placeholder="2023"></div>
+    <div class="field"><label for="edu-{{ i }}-grade">Grade</label>
+      <input type="text" id="edu-{{ i }}-grade" name="edu-{{ i }}-grade" value="{{ e.grade if e else '' }}" placeholder="CGPA: 8.4"></div>
+  </div>
+</div>
+{%- endmacro %}
+
+{% macro proj_entry(i, e) -%}
+<div class="entry">
+  <div class="entry-head"><b>Project</b><button type="button" class="danger" onclick="removeEntry(this)">Remove</button></div>
+  <div class="fields">
+    <div class="field"><label for="proj-{{ i }}-name">Name <span class="req">*</span></label>
+      <input type="text" id="proj-{{ i }}-name" name="proj-{{ i }}-name" value="{{ e.name if e else '' }}"></div>
+    <div class="field"><label for="proj-{{ i }}-url">Link</label>
+      <input type="url" id="proj-{{ i }}-url" name="proj-{{ i }}-url" value="{{ e.url if e else '' }}" placeholder="https://github.com/..."></div>
+    <div class="field wide"><label for="proj-{{ i }}-bullets">What it does and what you built — one point per line</label>
+      <textarea id="proj-{{ i }}-bullets" name="proj-{{ i }}-bullets" rows="3">{{ e.bullets|join("\n") if e else '' }}</textarea></div>
+    <div class="field wide"><label for="proj-{{ i }}-tech">Technologies (comma separated)</label>
+      <input type="text" id="proj-{{ i }}-tech" name="proj-{{ i }}-tech" value="{{ e.tech|join(', ') if e else '' }}"></div>
+  </div>
+</div>
+{%- endmacro %}
+
+<div class="page-head">
+  <div>
+    <h1>{% if onboarding %}Welcome — let's set you up{% else %}Your profile{% endif %}</h1>
+    <p>{% if onboarding %}Everything the agents need to find, score and apply to jobs for you.
+      Fill it once; you can change any of it later from <b>Profile</b>.{% else %}The single
+      source of truth for every tailored resume, cover letter and application answer.{% endif %}</p>
+  </div>
+</div>
+
+{% include "_messages.html" %}
+
+{% if draft %}
+<div class="banner">
+  <b>Unsaved import.</b> This form was filled from your resume and is not saved yet.
+  Review it and press Save, or
+  <form method="post" action="/setup/discard" style="display:inline"><button type="submit" style="padding:3px 10px;font-size:12.5px">discard it</button></form>
+</div>
+{% endif %}
+
+<div class="frame section"><div class="panel">
+  <h2>1. Start from your resume <span class="count">(optional, saves typing)</span></h2>
+  <p class="sub">Upload a text-based PDF and the form below is filled in for you. Nothing is saved until you press Save.
+    {% if has_resume %}A resume was uploaded before; uploading again replaces the work history below.{% endif %}</p>
+  <form method="post" action="/setup/resume" enctype="multipart/form-data" class="filterbar" id="resume-form">
+    <input type="file" name="resume" accept="application/pdf,.pdf" required aria-label="Resume PDF">
+    <label class="check" style="padding:0"><input type="checkbox" name="use_ai" value="1" checked> Read it with AI (more accurate)</label>
+    <button type="submit" class="primary" id="resume-btn">Read my resume</button>
+    <span class="meta" id="resume-wait" hidden>Reading your resume — this can take up to a minute…</span>
+  </form>
+</div></div>
+
+<form method="post" action="/setup" id="profile-form" novalidate>
+
+<div class="frame section"><div class="panel">
+  <h2>2. About you</h2>
+  <p class="sub">Used on every application form and at the top of every resume.</p>
+  <div class="fields">
+    <div class="field"><label for="name">Full name <span class="req">*</span></label>
+      <input type="text" id="name" name="name" value="{{ p.identity.name }}" autocomplete="name" required></div>
+    <div class="field"><label for="email">Email <span class="req">*</span></label>
+      <input type="email" id="email" name="email" value="{{ p.identity.email }}" autocomplete="email" required></div>
+    <div class="field"><label for="phone">Phone <span class="req">*</span></label>
+      <input type="tel" id="phone" name="phone" value="{{ p.identity.phone }}" autocomplete="tel" placeholder="+91 98xxx xxxxx" required></div>
+    <div class="field"><label for="location">Current location <span class="req">*</span></label>
+      <input type="text" id="location" name="location" value="{{ p.identity.location }}" placeholder="Pune, India" required>
+      <div class="hint">City, Country — the country part answers "country" questions.</div></div>
+    <div class="field"><label for="linkedin">LinkedIn URL</label>
+      <input type="text" id="linkedin" name="linkedin" value="{{ p.identity.linkedin }}" placeholder="linkedin.com/in/your-name"></div>
+    <div class="field"><label for="github">GitHub URL</label>
+      <input type="text" id="github" name="github" value="{{ p.identity.github }}" placeholder="github.com/your-name"></div>
+    <div class="field"><label for="portfolio">Portfolio / website</label>
+      <input type="text" id="portfolio" name="portfolio" value="{{ p.identity.portfolio }}"></div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>3. Work preferences</h2>
+  <p class="sub">Things a resume never says but every application asks. Leave a number blank rather than guess — a blank is reported to you, never invented.</p>
+  <div class="fields">
+    <div class="field"><label for="years_experience">Years of experience</label>
+      <input type="number" step="0.1" min="0" id="years_experience" name="years_experience" value="{{ p.preferences.years_experience if p.preferences.years_experience is not none else '' }}">
+      <div class="hint">Blank = worked out from your job dates.</div></div>
+    <div class="field"><label for="current_ctc_lpa">Current CTC (LPA)</label>
+      <input type="number" step="0.1" min="0" id="current_ctc_lpa" name="current_ctc_lpa" value="{{ p.preferences.current_ctc_lpa if p.preferences.current_ctc_lpa is not none else '' }}"></div>
+    <div class="field"><label for="expected_min_ctc_lpa">Expected CTC (LPA)</label>
+      <input type="number" step="0.1" min="0" id="expected_min_ctc_lpa" name="expected_min_ctc_lpa" value="{{ p.preferences.expected_min_ctc_lpa if p.preferences.expected_min_ctc_lpa is not none else '' }}"></div>
+    <div class="field"><label for="notice_period_days">Notice period (days)</label>
+      <input type="number" step="1" min="0" id="notice_period_days" name="notice_period_days" value="{{ p.preferences.notice_period_days if p.preferences.notice_period_days is not none else '' }}"></div>
+    <div class="field wide"><label for="preferred_locations">Preferred locations (comma separated)</label>
+      <input type="text" id="preferred_locations" name="preferred_locations" value="{{ p.preferences.preferred_locations|join(', ') }}" placeholder="Bengaluru, Pune, Remote">
+      <div class="hint">Office questions are answered "yes" only for places listed here (or remote).</div></div>
+    <div class="field wide">
+      <label class="check"><input type="checkbox" name="open_to_remote" {% if p.preferences.open_to_remote %}checked{% endif %}> Open to remote roles</label>
+      <label class="check"><input type="checkbox" name="willing_to_relocate" {% if p.preferences.willing_to_relocate %}checked{% endif %}> Willing to relocate within my country</label>
+      <label class="check"><input type="checkbox" name="willing_to_relocate_international" {% if p.answers.willing_to_relocate_international %}checked{% endif %}> Willing to relocate abroad</label>
+      <label class="check"><input type="checkbox" name="can_work_hybrid" {% if p.answers.can_work_hybrid %}checked{% endif %}> Can work hybrid / from an office in a location I listed</label>
+    </div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>4. Work authorisation</h2>
+  <p class="sub">Answered per posting, by the country the question names. A wrong answer here ends applications, so be exact.</p>
+  <div class="fields">
+    <div class="field"><label for="citizenship">Citizenship <span class="req">*</span></label>
+      <input type="text" id="citizenship" name="citizenship" value="{{ p.answers.citizenship }}" placeholder="India"></div>
+    <div class="field wide"><label for="work_authorization">Work authorisation, in your words</label>
+      <input type="text" id="work_authorization" name="work_authorization" value="{{ p.preferences.work_authorization }}" placeholder="Indian citizen; need visa sponsorship for US roles"></div>
+    <div class="field wide">
+      <label class="check"><input type="checkbox" name="needs_sponsorship_india" {% if p.answers.needs_sponsorship_india %}checked{% endif %}> I need visa sponsorship to work in India</label>
+      <label class="check"><input type="checkbox" name="needs_sponsorship_abroad" {% if p.answers.needs_sponsorship_abroad %}checked{% endif %}> I need visa sponsorship to work outside India</label>
+    </div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>5. Work experience</h2>
+  <p class="sub">Most recent first. Internships count, and are excluded from "years of experience" automatically.</p>
+  <div id="exp-list">
+    {% for e in p.experience %}{{ exp_entry(loop.index0, e) }}{% else %}{{ exp_entry(0, none) }}{% endfor %}
+  </div>
+  <template id="exp-tpl">{{ exp_entry("__i__", none) }}</template>
+  <button type="button" onclick="addEntry('exp')">+ Add a job</button>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>6. Education</h2>
+  <div id="edu-list">
+    {% for e in p.education %}{{ edu_entry(loop.index0, e) }}{% else %}{{ edu_entry(0, none) }}{% endfor %}
+  </div>
+  <template id="edu-tpl">{{ edu_entry("__i__", none) }}</template>
+  <button type="button" onclick="addEntry('edu')">+ Add education</button>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>7. Projects <span class="count">(optional)</span></h2>
+  <div id="proj-list">
+    {% for e in p.projects %}{{ proj_entry(loop.index0, e) }}{% endfor %}
+  </div>
+  <template id="proj-tpl">{{ proj_entry("__i__", none) }}</template>
+  <button type="button" onclick="addEntry('proj')">+ Add a project</button>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>8. Skills and achievements</h2>
+  <p class="sub">Jobs are scored against these, and a tailored resume can only mention skills listed here.</p>
+  <div class="fields">
+    <div class="field wide"><label for="skills_languages">Languages</label>
+      <input type="text" id="skills_languages" name="skills_languages" value="{{ p.skills.languages|join(', ') }}" placeholder="Python, Java, TypeScript, SQL"></div>
+    <div class="field wide"><label for="skills_frameworks">Frameworks and libraries</label>
+      <input type="text" id="skills_frameworks" name="skills_frameworks" value="{{ p.skills.frameworks|join(', ') }}" placeholder="React, Spring Boot, FastAPI"></div>
+    <div class="field wide"><label for="skills_tools">Tools and platforms</label>
+      <input type="text" id="skills_tools" name="skills_tools" value="{{ p.skills.tools|join(', ') }}" placeholder="Docker, Kubernetes, AWS, Git"></div>
+    <div class="field wide"><label for="skills_domains">Domains</label>
+      <input type="text" id="skills_domains" name="skills_domains" value="{{ p.skills.domains|join(', ') }}" placeholder="Distributed systems, RAG, Payments"></div>
+    <div class="field wide"><label for="achievements">Achievements — one per line</label>
+      <textarea id="achievements" name="achievements" rows="3">{{ p.achievements|join("\n") }}</textarea></div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>9. Standing answers for application forms <span class="count">(optional)</span></h2>
+  <p class="sub">Voluntary questions US forms ask. Leave blank to have them left unanswered.</p>
+  <div class="fields">
+    <div class="field"><label for="how_did_you_hear">How did you hear about us?</label>
+      <input type="text" id="how_did_you_hear" name="how_did_you_hear" value="{{ p.answers.how_did_you_hear }}" placeholder="Company website"></div>
+    <div class="field"><label for="pronouns">Pronouns</label>
+      <input type="text" id="pronouns" name="pronouns" value="{{ p.answers.pronouns }}"></div>
+    {% for key, options in eeo.items() %}
+    <div class="field"><label for="{{ key }}">{{ {"gender": "Gender", "race_ethnicity": "Race / ethnicity", "hispanic_latino": "Hispanic or Latino", "veteran_status": "Veteran status", "disability_status": "Disability status"}[key] }}</label>
+      <input type="text" id="{{ key }}" name="{{ key }}" value="{{ p.answers[key] }}" list="{{ key }}-options">
+      <datalist id="{{ key }}-options">{% for o in options %}<option value="{{ o }}">{% endfor %}</datalist></div>
+    {% endfor %}
+    <div class="field wide">
+      <label class="check"><input type="checkbox" name="consent_to_sms" {% if p.answers.consent_to_sms %}checked{% endif %}> OK for employers to text me about my application</label>
+    </div>
+  </div>
+</div></div>
+
+<div class="savebar">
+  <small>Fields marked <span style="color:var(--bad)">*</span> are required.</small>
+  <span class="grow"></span>
+  {% if not onboarding %}<a class="btn" href="/">Cancel</a>{% endif %}
+  <button type="submit" class="primary">{% if onboarding %}Save and continue &rarr;{% else %}Save profile{% endif %}</button>
+</div>
+</form>
+
+<script>
+  function addEntry(kind) {
+    const list = document.getElementById(kind + "-list");
+    const tpl = document.getElementById(kind + "-tpl").innerHTML;
+    const i = 1000 + list.children.length + Math.floor(Math.random() * 100000);
+    list.insertAdjacentHTML("beforeend", tpl.replaceAll("__i__", String(i)));
+    const first = list.lastElementChild.querySelector("input");
+    if (first) first.focus();
+  }
+  function removeEntry(btn) { btn.closest(".entry").remove(); }
+  document.getElementById("resume-form").addEventListener("submit", function () {
+    const btn = document.getElementById("resume-btn");
+    btn.disabled = true; btn.textContent = "Reading…";
+    document.getElementById("resume-wait").hidden = false;
+  });
+</script>
+{% endblock %}

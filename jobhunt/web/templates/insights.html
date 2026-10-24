@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Insights{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Insights</h1>
+    <p>What actually converts. Rates only appear once a bucket has
+      {{ min_for_rate }} applications behind it — below that you get the raw
+      count, because a percentage off three samples is noise with a percent sign.</p>
+  </div>
+</div>
+
+<h2>The funnel</h2>
+<div class="funnel">
+  {% for label, n in funnel.items() %}
+    <div class="step {% if n %}live{% endif %}"><b>{{ n }}</b><span>{{ label }}</span></div>
+    {% if not loop.last %}<i class="arrow">&rsaquo;</i>{% endif %}
+  {% endfor %}
+</div>
+
+<h2>How fresh is what you're about to apply to?</h2>
+{% if freshness.n %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      <span class="badge {% if stale_share > 50 %}review{% else %}done{% endif %}">
+        median {{ freshness.median }} days old</span>
+      <span class="badge off">{{ stale_share }}% over a month</span>
+      {% if freshness.last_sourced %}
+        <span class="badge off">last sourced {{ freshness.last_sourced.strftime("%d %b") }}</span>
+      {% endif %}
+    </div>
+    <div class="chips" style="margin-top:12px">
+      {% for label, n in freshness.buckets %}
+        <span class="chip {% if not n %}more{% endif %}">{{ label }} · {{ n }}</span>
+      {% endfor %}
+      {% if freshness.unknown %}
+        <span class="chip more">date unknown · {{ freshness.unknown }}</span>{% endif %}
+    </div>
+    {% if stale_share > 50 %}
+    <div class="jsub" style="margin-top:12px">
+      More than half of what cleared your bar is over a month old, and a posting's
+      first days are when a reply is most likely. Run <b>Find jobs now</b> on the
+      <a href="/runs">Runs</a> page — and if the fresh count stays near zero, the
+      constraint is your pay floor on <a href="/filters">Filters</a>, not the sourcing.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+  <div class="empty">Nothing above the bar right now.</div>
+{% endif %}
+
+{% if sent_total < min_for_rate %}
+<div class="banner">
+  <b>{{ sent_total }} application{{ "s" if sent_total != 1 }} sent so far.</b>
+  Nothing below is a rate yet — it needs about {{ min_for_rate }} per bucket before
+  the numbers mean anything. The breakdowns are here so the shape is familiar by
+  the time they do.
+</div>
+{% endif %}
+
+{% for title, rows in groups %}
+<h2>{{ title }}</h2>
+{% if rows %}
+<div class="table-wrap scroll">
+<table>
+  <thead><tr>
+    <th>{{ title.lower() }}</th><th>sent</th><th>any reply</th><th>reply rate</th>
+    <th>advanced</th><th>advance rate</th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr>
+    <td>{{ r.name }}</td>
+    <td>{{ r.sent }}</td>
+    <td>{{ r.replied }}</td>
+    <td {% if r.thin %}style="color:var(--muted)"{% endif %}>{{ r.reply_rate }}</td>
+    <td>{{ r.advanced }}</td>
+    <td {% if r.thin %}style="color:var(--muted)"{% endif %}>{{ r.advance_rate }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <div class="empty">Nothing sent yet.</div>
+{% endif %}
+{% endfor %}
+
+<h2>What to do with this</h2>
+<div class="frame">
+  <div class="panel">
+    <div class="jsub" style="line-height:1.8">
+      <b>Score band</b> is the one that settles whether <code>apply_threshold</code>
+      is right. If 3.75–4.0 advances at a similar rate to 4.5+, the bar is too high
+      and you are discarding real chances.<br>
+      <b>ATS coverage</b> tests whether the tailoring is worth its LLM calls. If
+      85% converts like 100%, stop paying for the last 15 points.<br>
+      <b>Level band</b> tests the stretch strategy — if <code>stretch</code> never
+      advances, drop <code>max_level_number</code> to 1 and save the effort.<br>
+      <b>Source</b> tells you where to spend sourcing work, and which boards are
+      reposting stale listings.
+    </div>
+  </div>
+</div>
+
+{% endblock %}

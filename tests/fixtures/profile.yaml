@@ -1,0 +1,159 @@
+identity:
+  name: Aarav Mehta
+  email: aarav.mehta@example.com
+  phone: +91 90000 12345
+  location: Bengaluru, India
+  linkedin: linkedin.com/in/aarav-mehta-example
+  github: github.com/aarav-mehta-example
+  portfolio: ''
+preferences:
+  current_ctc_lpa: 24.0
+  expected_min_ctc_lpa: 36.0
+  notice_period_days: 60
+  preferred_locations:
+  - Bengaluru
+  - Remote
+  open_to_remote: true
+  willing_to_relocate: false
+  work_authorization: Indian citizen. Authorised to work in India without sponsorship; requires sponsorship
+    for US/UK/EU roles.
+  years_experience: null
+answers:
+  needs_sponsorship_abroad: true
+  needs_sponsorship_india: false
+  work_auth_statement: Indian citizen. Authorised to work in India without sponsorship; requires sponsorship
+    for US/UK/EU roles.
+  citizenship: India
+  preferred_locations:
+  - Bengaluru
+  - Remote
+  - Hyderabad
+  - Gurugram
+  - Pune
+  willing_to_relocate_domestic: true
+  willing_to_relocate_international: false
+  can_work_hybrid: true
+  open_to_remote: true
+  earliest_start: 1 month from offer
+  notice_period_days: 60
+  expected_ctc_inr_lpa: 36.0
+  expected_base_usd: null
+  salary_negotiable: true
+  previously_employed_here: false
+  family_employed_here: false
+  flag_companies:
+  - Northwind
+  gender: Decline to self-identify
+  race_ethnicity: Decline to self-identify
+  veteran_status: I am not a protected veteran
+  disability_status: No, I do not have a disability
+  hispanic_latino: 'No'
+  pronouns: ''
+  how_did_you_hear: Company website
+  portfolio_url: ''
+  other_url: ''
+  requires_accommodation: ''
+  consent_to_sms: false
+  background_check_consent: true
+  references_available: Available on request
+education:
+- institution: Indian Institute of Information Technology, Pune
+  degree: Bachelor of Technology
+  field: Computer Science and Engineering
+  start: '2021'
+  end: '2025'
+  grade: 'CPI: 8.1'
+experience:
+- company: Northwind
+  title: Software Engineer
+  location: Bengaluru, India
+  start: July 2025
+  end: Present
+  bullets:
+  - Build Northwind's customer messaging platform, unifying chat, voice, email and SMS channels
+    within one enterprise orchestration layer.
+  - Delivered five full-stack integrations—Zendesk, Twilio, Stripe, Slack, and partner
+    self-provisioning—using React, TypeScript, Java, and Spring Boot.
+  - Engineered a GitLab CI/CD pipeline for frontend coverage and Playwright/Cypress automation, replacing
+    20+ manual commands and reducing execution time from over half a day to approximately two hours.
+  - Created six reusable AI-assisted SDLC skills for Figma-to-code, Swagger API implementation, Jira delivery,
+    bug triage, merge-request review, and test automation using RAG and tool calling.
+  - Diagnosed and resolved 87 defects in one year, including 9 long-pending issues and multiple Sev2
+    and Sev3 production fixes, across frontend, backend, and CI/CD.
+  - Optimized four critical workflows by eliminating duplicate API and database calls, improving performance,
+    data consistency, and release reliability.
+  - Led cross-functional delivery of multiple releases, production fixes, and end-to-end epics across
+    product, QA, and platform teams; communicated risks, release readiness, and Playwright practices.
+  tech: []
+- company: Contoso
+  title: Technical Intern
+  location: Pune, India
+  start: October 2023
+  end: January 2024
+  bullets:
+  - Built a Kotlin Android application with multi-factor authentication to secure access across smart
+    devices.
+  - Integrated Kerberos authorization and SQLite session management, reducing unauthorized access by 90%.
+  tech:
+  - Kotlin
+  - Java
+  - SQLite
+  - Python
+- company: Fabrikam
+  title: Cybersecurity Intern
+  location: Germany (Remote)
+  start: June 2023
+  end: August 2023
+  bullets:
+  - Automated CMS vulnerability scanning using Python and shell scripts.
+  - Containerized a Docker-based IDS/IPS integration for WordPress, reducing security breaches by 50%.
+  tech:
+  - Python
+  - Shell
+  - Docker
+projects:
+- name: AI-ASSISTED ENGINEERING AGENT PLATFORM
+  tech:
+  - Python
+  - Node.js
+  - React
+  - SQLite
+  - OCI
+  bullets:
+  - Built an AI engineering-agent platform with hybrid code retrieval, RAG, approval-gated tool execution,
+    auditable run history, and Figma, Jira, Swagger, and GitLab integrations.
+  url: ''
+skills:
+  languages:
+  - Python
+  - Java
+  - TypeScript
+  - JavaScript
+  - SQL
+  - C/C++
+  frameworks:
+  - React
+  - Spring Boot
+  - Node.js
+  tools:
+  - Playwright
+  - Cypress
+  - GitLab CI/CD
+  - Docker
+  - Kubernetes
+  - OCI
+  - Git
+  - MongoDB
+  - OpenAPI/Swagger
+  domains:
+  - REST APIs
+  - AI Agents
+  - RAG
+  - Vector Embeddings
+achievements:
+- Received the company Engineering Excellence Award (FY25 Q3).
+- Recognized as sprint MVP twice for engineering delivery and ownership.
+- Won first place at CodeSprint 2024 for Best Product and second place at BuildFest 2.0 for Best AI
+  Use Case.
+- Placed 11th in a national capture-the-flag contest among 300+ teams.
+- Solved 600+ data-structure and algorithm problems on LeetCode and Codeforces.

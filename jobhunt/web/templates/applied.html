@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Applied jobs{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Applied jobs</h1>
+    <p>Everything sent, and everything prepared but not sent. A row marked
+      <b>not sent</b> is a filled, screenshotted form waiting on you — nothing
+      has reached the employer.</p>
+  </div>
+  <span class="grow"></span>
+  <a class="btn" href="/">Back to queue</a>
+</div>
+
+<div class="funnel">
+  {% for label, n in funnel %}
+    <div class="step {% if n %}live{% endif %}">
+      <b>{{ n }}</b><span>{{ label }}</span>
+    </div>
+    {% if not loop.last %}<i class="arrow">&rsaquo;</i>{% endif %}
+  {% endfor %}
+</div>
+
+<div class="tabs">
+  {% for key, label, n in tabs %}
+    <a href="/applied?state={{ key|urlencode }}" class="{% if key == current %}on{% endif %}">
+      {{ label }}<span class="n">{{ n }}</span></a>
+  {% endfor %}
+</div>
+
+{% if rows %}
+<div class="grid2">
+  {% for row in rows %}
+  {% set job = row.job %}{% set app = row.app %}
+  <div class="frame">
+    <div class="panel">
+      <div class="card-top">
+        {# "Applied on" is only true once something was actually sent. A
+           prefilled form that is still waiting on you says so - reading
+           "Applied on" over a form nobody submitted is alarming and wrong. #}
+        {% set is_sent = app.status not in ("awaiting_your_submit",) %}
+        <span class="stamp {% if not is_sent %}pending{% endif %}">
+          {% if is_sent %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+            Applied on {{ app.applied_at.strftime("%b %d, %Y") }}
+          {% else %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            Prepared {{ app.applied_at.strftime("%b %d") }} · not sent
+          {% endif %}
+        </span>
+        <span class="grow"></span>
+        <span class="badge {{ row.tone }}">{{ row.label }}</span>
+      </div>
+
+      <a class="jtitle" href="/job/{{ job.id }}">{{ job.title }}</a>
+      <div class="jsub">
+        {{ job.company }}
+        {%- if job.location %} · {{ job.location }}{% endif %}
+        {%- if job.score %} · scored {{ "%.2f"|format(job.score) }}{% endif %}
+      </div>
+
+      {% if row.skills %}
+        <div class="label">Skills your resume surfaced for this role</div>
+        <div class="chips">
+          {% for skill in row.skills[:5] %}<span class="chip">{{ skill }}</span>{% endfor %}
+          {% if row.skills|length > 5 %}
+            <span class="chip more">+{{ row.skills|length - 5 }}</span>{% endif %}
+        </div>
+      {% elif app.notes %}
+        <div class="label">What happened</div>
+        <div class="jsub">{{ app.notes[:160] }}</div>
+      {% endif %}
+
+      {% if row.stale %}
+        <div class="label">Why this one stopped</div>
+        <div class="jsub">{{ row.stale_reason or "The job no longer passes your filters." }}</div>
+      {% endif %}
+
+      <div class="actions">
+        <a class="btn" href="{{ job.url }}" target="_blank" rel="noopener">Posting</a>
+        {% if row.resume %}
+          <a class="btn" href="/resume/{{ row.resume.id }}" target="_blank"{% if row.resume_stale %} title="{{ row.resume_stale }}"{% endif %}>{{ "Resume (old layout)" if row.resume_stale else "Resume" }}</a>{% endif %}
+        {% if app.screenshot_path %}
+          <a class="btn" href="/screenshot/{{ app.id }}" target="_blank">See the filled form</a>
+        {% endif %}
+        {% if app.status == "awaiting_your_submit" and not row.stale %}
+          {#- The agent runs headless and, in shadow mode, never clicks submit.
+              So this link - not a button - is the thing that actually finishes
+              an application: it opens the real form for you to send. -#}
+          {#- Never emit an empty href: the browser reads href="" as "reload
+              this page", so a missing value turns the button into a silent
+              loop rather than a visible error. -#}
+          <a class="btn primary-link" href="{{ row.apply_url or job.url }}"
+             target="_blank" rel="noopener">Open the form to submit</a>
+          <form method="post" action="/job/{{ job.id }}/apply" class="inline">
+            <button>{% if shadow_mode %}Re-fill &amp; screenshot{% else %}Submit it now{% endif %}</button>
+          </form>
+        {% endif %}
+      </div>
+      {% if app.status == "awaiting_your_submit" and not row.stale and shadow_mode %}
+        <div class="meta" style="margin-top:8px">
+          Shadow mode is on, so nothing here submits itself. Open the form and
+          send it yourself, or switch off practice mode on <a href="/filters#autonomy">Filters</a> to let clean
+          forms go automatically.
+        </div>
+      {% endif %}
+
+      {% set moves = next_stage.get(app.status, []) %}
+      {% if moves and not row.stale %}
+      <div class="stage-row">
+        <span class="label" style="margin:0">Heard back?</span>
+        <form method="post" action="/application/{{ app.id }}/stage" class="inline">
+          {% for m in moves %}
+            <button name="stage" value="{{ m }}"
+                    class="{% if m == 'rejected' %}danger{% endif %}">{{ stage_labels[m] }}</button>
+          {% endfor %}
+        </form>
+      </div>
+      {% endif %}
+
+      {% if app.status in ("screen", "interview", "onsite", "offer") %}
+      <div class="stage-row">
+        <form method="post" action="/application/{{ app.id }}/followup" class="inline">
+          <button class="primary">Draft follow-up note</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="empty">
+    Nothing here yet. Approve something on the <a href="/">queue</a>, or start
+    <b>Apply &amp; follow up</b> on the <a href="/runs">Runs</a> page.
+  </div>
+{% endif %}
+
+{% endblock %}

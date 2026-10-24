@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Archive{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Archive</h1>
+    <p>Every rejection records why, so the filters can be tuned rather than guessed
+      at. If good jobs are showing up here, lower the minimum score on the
+      <a href="/filters">Filters</a> page — it re-applies the bar to every scored
+      job without paying for the AI again.</p>
+  </div>
+</div>
+
+<h2>Scored but below the bar <span class="count">{{ archived|length }}</span></h2>
+<div class="table-wrap scroll">
+<table>
+  <thead><tr><th>score</th><th>company</th><th>title</th><th>why</th></tr></thead>
+  <tbody>
+  {% for job in archived %}
+  <tr>
+    <td><span class="score mid">{{ "%.2f"|format(job.score) if job.score else "—" }}</span></td>
+    <td>{{ job.company }}</td>
+    <td><a href="/job/{{ job.id }}">{{ job.title[:44] }}</a></td>
+    <td style="color:var(--muted)">{{ (job.score_summary or job.status_reason or "")[:90] }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4" style="color:var(--muted);padding:28px;text-align:center">Nothing archived yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Filtered out before scoring</h2>
+<p class="meta" style="margin:-6px 0 12px">
+  Rejected by the deterministic gate — level, work authorisation or pay floor.</p>
+<div class="table-wrap scroll">
+<table>
+  <thead><tr><th>company</th><th>title</th><th>reason</th></tr></thead>
+  <tbody>
+  {% for job in gate_rejected %}
+  <tr>
+    <td>{{ job.company }}</td>
+    <td><a href="/job/{{ job.id }}">{{ job.title[:44] }}</a></td>
+    <td style="color:var(--muted)">{{ (job.status_reason or "")[:80] }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="3" style="color:var(--muted);padding:28px;text-align:center">Nothing yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}

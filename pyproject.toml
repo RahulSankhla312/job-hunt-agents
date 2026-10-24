@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jobhunt-agents"
+version = "1.0.0"
+description = "A local team of AI agents that finds, filters, scores and applies to jobs for you."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+# Keep in step with requirements.txt - tests/test_packaging.py checks.
+dependencies = [
+    "pydantic>=2.9,<3",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "PyYAML>=6.0",
+    "httpx>=0.27",
+    "tenacity>=9.0",
+    "SQLModel>=0.0.22",
+    "SQLAlchemy>=2.0",
+    "APScheduler>=3.10,<4",
+    "feedparser>=6.0",
+    "rapidfuzz>=3.10",
+    "playwright>=1.49",
+    "pdfminer.six>=20240706",
+    "Jinja2>=3.1",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "python-multipart>=0.0.17",
+    "google-api-python-client>=2.150",
+    "google-auth-oauthlib>=1.2",
+    "dnspython>=2.7",
+    "typer>=0.15",
+    "rich>=13.9",
+    "anthropic>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "ruff>=0.8"]
+
+[project.scripts]
+jobhunt = "jobhunt.cli:main"
+
+# The app runs from its checkout: config/ and data/ live beside the package.
+# `pip install -e .` gives you the `jobhunt` command without moving anything.
+[tool.setuptools.packages.find]
+include = ["jobhunt*"]
+
+[tool.setuptools.package-data]
+"jobhunt.web" = ["templates/*.html"]
+"jobhunt.resume" = ["*.html"]
+"jobhunt.demo" = ["*.yaml"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",    # long lines are wrapped by judgement, not by a counter
+    "SIM102",  # nested ifs often read better with a comment between them
+    "SIM103",
+    "SIM105",
+    "SIM108",
+    "UP042",   # str+Enum is deliberate: StrEnum formats differently
+]
+
+[tool.ruff.lint.per-file-ignores]
+"jobhunt/sources/contacts.py" = ["E741"]  # f, l = first, last in email patterns
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.File", "fastapi.Form", "fastapi.Depends", "typer.Option", "typer.Argument"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# Third-party deprecation chatter (starlette/anyio/fastapi) drowns the summary.
+filterwarnings = ["ignore::DeprecationWarning"]

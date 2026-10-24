@@ -1,0 +1,1065 @@
+bands:
+  1:
+    india_ctc_lpa:
+    - 45
+    - 90
+    us_base_usd:
+    - 150000
+    - 300000
+    note: Top-of-market. Clears the floor on estimate alone.
+  2:
+    india_ctc_lpa:
+    - 32
+    - 60
+    us_base_usd:
+    - 120000
+    - 200000
+    note: Straddles the floor - needs posting evidence or Analyst judgement.
+  3:
+    india_ctc_lpa:
+    - 20
+    - 45
+    us_base_usd:
+    - 90000
+    - 150000
+    note: Usually below floor; only senior/AI-track postings survive.
+companies:
+- name: OpenAI
+  tier: 1
+  ats: ashby
+  slug: openai
+  regions:
+  - us
+  - india
+- name: Anthropic
+  tier: 1
+  ats: greenhouse
+  slug: anthropic
+  regions:
+  - us
+  - india
+- name: Databricks
+  tier: 1
+  ats: greenhouse
+  slug: databricks
+  regions:
+  - us
+  - india
+- name: Stripe
+  tier: 1
+  ats: greenhouse
+  slug: stripe
+  regions:
+  - us
+  - india
+- name: Rubrik
+  tier: 1
+  ats: greenhouse
+  slug: rubrik
+  regions:
+  - us
+  - india
+- name: Snowflake
+  tier: 1
+  ats: ashby
+  slug: snowflake
+  regions:
+  - us
+  - india
+- name: Confluent
+  tier: 1
+  ats: ashby
+  slug: confluent
+  regions:
+  - us
+  - india
+- name: Coinbase
+  tier: 1
+  ats: greenhouse
+  slug: coinbase
+  regions:
+  - us
+  - india
+  - remote
+- name: Robinhood
+  tier: 1
+  ats: greenhouse
+  slug: robinhood
+  regions:
+  - us
+  - india
+- name: Airbnb
+  tier: 1
+  ats: greenhouse
+  slug: airbnb
+  regions:
+  - us
+- name: Figma
+  tier: 1
+  ats: greenhouse
+  slug: figma
+  regions:
+  - us
+- name: Scale AI
+  tier: 1
+  ats: greenhouse
+  slug: scaleai
+  regions:
+  - us
+- name: Cohere
+  tier: 1
+  ats: ashby
+  slug: cohere
+  regions:
+  - us
+  - canada
+  - remote
+- name: Cursor
+  tier: 1
+  ats: ashby
+  slug: cursor
+  regions:
+  - us
+- name: Harvey
+  tier: 1
+  ats: ashby
+  slug: harvey
+  regions:
+  - us
+- name: Notion
+  tier: 1
+  ats: ashby
+  slug: notion
+  regions:
+  - us
+- name: Linear
+  tier: 1
+  ats: ashby
+  slug: linear
+  regions:
+  - remote
+- name: Ramp
+  tier: 1
+  ats: ashby
+  slug: ramp
+  regions:
+  - us
+- name: Plaid
+  tier: 1
+  ats: ashby
+  slug: plaid
+  regions:
+  - us
+- name: Figure AI
+  tier: 1
+  ats: greenhouse
+  slug: figureai
+  regions:
+  - us
+- name: Datadog
+  tier: 1
+  ats: greenhouse
+  slug: datadog
+  regions:
+  - us
+  - india
+- name: Cloudflare
+  tier: 1
+  ats: greenhouse
+  slug: cloudflare
+  regions:
+  - us
+  - india
+- name: MongoDB
+  tier: 1
+  ats: greenhouse
+  slug: mongodb
+  regions:
+  - us
+  - india
+- name: Dropbox
+  tier: 2
+  ats: greenhouse
+  slug: dropbox
+  regions:
+  - us
+  - remote
+- name: Pinterest
+  tier: 2
+  ats: greenhouse
+  slug: pinterest
+  regions:
+  - us
+- name: Reddit
+  tier: 2
+  ats: greenhouse
+  slug: reddit
+  regions:
+  - us
+  - remote
+- name: Instacart
+  tier: 2
+  ats: greenhouse
+  slug: instacart
+  regions:
+  - us
+  - canada
+- name: Twilio
+  tier: 2
+  ats: greenhouse
+  slug: twilio
+  regions:
+  - us
+  - india
+  - remote
+- name: Okta
+  tier: 2
+  ats: greenhouse
+  slug: okta
+  regions:
+  - us
+  - india
+- name: GitLab
+  tier: 2
+  ats: greenhouse
+  slug: gitlab
+  regions:
+  - remote
+- name: Elastic
+  tier: 2
+  ats: greenhouse
+  slug: elastic
+  regions:
+  - remote
+  - india
+- name: Vercel
+  tier: 2
+  ats: greenhouse
+  slug: vercel
+  regions:
+  - us
+  - remote
+- name: Supabase
+  tier: 2
+  ats: ashby
+  slug: supabase
+  regions:
+  - remote
+- name: Temporal
+  tier: 2
+  ats: ashby
+  slug: temporal
+  regions:
+  - us
+  - remote
+- name: Render
+  tier: 2
+  ats: ashby
+  slug: render
+  regions:
+  - us
+  - remote
+- name: Replit
+  tier: 2
+  ats: ashby
+  slug: replit
+  regions:
+  - us
+- name: Benchling
+  tier: 2
+  ats: ashby
+  slug: benchling
+  regions:
+  - us
+- name: Remote.com
+  tier: 2
+  ats: greenhouse
+  slug: remotecom
+  regions:
+  - remote
+- name: Lyft
+  tier: 2
+  ats: greenhouse
+  slug: lyft
+  regions:
+  - us
+- name: Affirm
+  tier: 2
+  ats: greenhouse
+  slug: affirm
+  regions:
+  - us
+  - remote
+- name: Gusto
+  tier: 2
+  ats: greenhouse
+  slug: gusto
+  regions:
+  - us
+- name: Asana
+  tier: 2
+  ats: greenhouse
+  slug: asana
+  regions:
+  - us
+  - india
+- name: Workato
+  tier: 2
+  ats: greenhouse
+  slug: workato
+  regions:
+  - us
+  - india
+- name: Turing
+  tier: 2
+  ats: greenhouse
+  slug: turing
+  regions:
+  - remote
+  - india
+- name: Postman
+  tier: 2
+  ats: greenhouse
+  slug: postman
+  regions:
+  - india
+  - us
+- name: Groww
+  tier: 2
+  ats: greenhouse
+  slug: groww
+  regions:
+  - india
+- name: CRED
+  tier: 2
+  ats: lever
+  slug: cred
+  regions:
+  - india
+- name: Zeta
+  tier: 3
+  ats: lever
+  slug: zeta
+  regions:
+  - india
+- name: NVIDIA
+  tier: 1
+  ats: workday
+  slug: nvidia
+  wd_site: NVIDIAExternalCareerSite
+  wd_host: wd5
+  regions:
+  - us
+  - india
+- name: Salesforce
+  tier: 1
+  ats: workday
+  slug: salesforce
+  wd_site: External_Career_Site
+  wd_host: wd12
+  regions:
+  - us
+  - india
+- name: Adobe
+  tier: 1
+  ats: workday
+  slug: adobe
+  wd_site: external_experienced
+  wd_host: wd5
+  regions:
+  - us
+  - india
+- name: Mastercard
+  tier: 2
+  ats: workday
+  slug: mastercard
+  wd_site: CorporateCareers
+  wd_host: wd1
+  regions:
+  - us
+  - india
+- name: PayPal
+  tier: 2
+  ats: workday
+  slug: paypal
+  wd_site: jobs
+  wd_host: wd1
+  regions:
+  - us
+  - india
+- name: Red Hat
+  tier: 2
+  ats: workday
+  slug: redhat
+  wd_site: Jobs
+  wd_host: wd5
+  regions:
+  - us
+  - india
+  - remote
+- name: Workday
+  tier: 2
+  ats: workday
+  slug: workday
+  wd_site: Workday
+  wd_host: wd5
+  regions:
+  - us
+  - india
+- name: Amazon
+  tier: 1
+  ats: amazon
+  slug: amazon
+  regions:
+  - us
+  - india
+- name: Sprinklr
+  tier: 2
+  ats: workday
+  slug: sprinklr
+  wd_site: Careers
+  wd_host: wd1
+- name: Meesho
+  tier: 2
+  ats: lever
+  slug: meesho
+- name: Visa
+  tier: 2
+  ats: workday
+  slug: visa
+  wd_site: Visa
+  wd_host: wd5
+- name: Slice
+  tier: 2
+  ats: greenhouse
+  slug: slice
+- name: Samsung Semiconductor India Research
+  tier: 2
+  ats: greenhouse
+  slug: samsungsemiconductor
+- name: Atlan
+  tier: 2
+  ats: ashby
+  slug: atlan
+- name: Tekion India Private limited
+  tier: 2
+  ats: ashby
+  slug: tekion
+- name: Celigo
+  tier: 2
+  ats: greenhouse
+  slug: celigo
+- name: BAKER HUGHES
+  tier: 2
+  ats: workday
+  slug: bakerhughes
+  wd_site: Bakerhughes
+  wd_host: wd5
+- name: Tower Research Capital
+  tier: 1
+  ats: greenhouse
+  slug: towerresearchcapital
+  regions:
+  - us
+  - india
+- name: Jane Street
+  tier: 1
+  ats: greenhouse
+  slug: janestreet
+  regions:
+  - us
+  - india
+- name: Jump Trading
+  tier: 1
+  ats: greenhouse
+  slug: jumptrading
+  regions:
+  - us
+  - india
+- name: WorldQuant
+  tier: 1
+  ats: greenhouse
+  slug: worldquant
+  regions:
+  - us
+  - india
+- name: Flow Traders
+  tier: 1
+  ats: greenhouse
+  slug: flowtraders
+  regions:
+  - us
+  - india
+- name: Squarepoint Capital
+  tier: 1
+  ats: greenhouse
+  slug: squarepointcapital
+  regions:
+  - us
+  - india
+- name: Akuna Capital
+  tier: 1
+  ats: greenhouse
+  slug: akunacapital
+  regions:
+  - us
+  - india
+- name: Virtu Financial
+  tier: 1
+  ats: greenhouse
+  slug: virtu
+  regions:
+  - us
+  - india
+- name: Point72
+  tier: 1
+  ats: greenhouse
+  slug: point72
+  regions:
+  - us
+  - india
+- name: Da Vinci Derivatives
+  tier: 1
+  ats: greenhouse
+  slug: davinciderivatives
+  regions:
+  - us
+  - india
+- name: Old Mission Capital
+  tier: 1
+  ats: greenhouse
+  slug: oldmissioncapital
+  regions:
+  - us
+  - india
+- name: Belvedere Trading
+  tier: 1
+  ats: lever
+  slug: belvederetrading
+  regions:
+  - us
+  - india
+- name: Graviton Research Capital
+  tier: 1
+  ats: greenhouse
+  slug: gravitonresearchcapital
+  regions:
+  - us
+  - india
+- name: AlphaGrep Securities
+  tier: 1
+  ats: greenhouse
+  slug: alphagrepsecurities
+  regions:
+  - us
+  - india
+- name: NK Securities Research
+  tier: 1
+  ats: greenhouse
+  slug: nksecuritiesresearch
+  regions:
+  - us
+  - india
+- name: LinkedIn
+  tier: 2
+  ats: lever
+  slug: linkedin
+- name: Block
+  tier: 2
+  ats: greenhouse
+  slug: block
+- name: Intel
+  tier: 2
+  ats: workday
+  slug: intel
+  wd_site: External
+  wd_host: wd1
+- name: Zscaler
+  tier: 2
+  ats: greenhouse
+  slug: zscaler
+- name: Zoom
+  tier: 2
+  ats: workday
+  slug: zoom
+  wd_site: Zoom
+  wd_host: wd5
+- name: Navi
+  tier: 2
+  ats: ashby
+  slug: navi
+- name: InMobi
+  tier: 2
+  ats: greenhouse
+  slug: inmobi
+- name: BrowserStack
+  tier: 2
+  ats: workday
+  slug: browserstack
+  wd_site: External
+  wd_host: wd3
+- name: HighRadius
+  tier: 2
+  ats: greenhouse
+  slug: highradius
+- name: Observe.ai
+  tier: 2
+  ats: greenhouse
+  slug: observeai
+- name: Mindtickle
+  tier: 2
+  ats: lever
+  slug: mindtickle
+- name: Together AI
+  tier: 2
+  ats: greenhouse
+  slug: togetherai
+- name: Fireworks AI
+  tier: 2
+  ats: ashby
+  slug: fireworks
+- name: Anyscale
+  tier: 2
+  ats: ashby
+  slug: anyscale
+- name: LangChain
+  tier: 2
+  ats: ashby
+  slug: langchain
+- name: Pinecone
+  tier: 2
+  ats: ashby
+  slug: pinecone
+- name: Weaviate
+  tier: 2
+  ats: ashby
+  slug: weaviate
+- name: Modal
+  tier: 2
+  ats: ashby
+  slug: modal
+- name: Runway
+  tier: 2
+  ats: ashby
+  slug: runway
+- name: ElevenLabs
+  tier: 2
+  ats: ashby
+  slug: elevenlabs
+- name: Luma AI
+  tier: 2
+  ats: ashby
+  slug: lumaai
+- name: Character AI
+  tier: 2
+  ats: ashby
+  slug: character
+- name: Sierra
+  tier: 2
+  ats: ashby
+  slug: sierra
+- name: Decagon
+  tier: 2
+  ats: ashby
+  slug: decagon
+- name: Cresta
+  tier: 2
+  ats: greenhouse
+  slug: cresta
+- name: Abridge
+  tier: 2
+  ats: ashby
+  slug: abridge
+- name: Sarvam AI
+  tier: 2
+  ats: ashby
+  slug: sarvam
+- name: Perplexity
+  tier: 2
+  ats: ashby
+  slug: perplexity
+- name: Baseten
+  tier: 2
+  ats: ashby
+  slug: baseten
+- name: Cerebras
+  tier: 2
+  ats: ashby
+  slug: cerebras
+- name: Netlify
+  tier: 2
+  ats: greenhouse
+  slug: netlify
+- name: Fly.io
+  tier: 2
+  ats: lever
+  slug: fly
+- name: PlanetScale
+  tier: 2
+  ats: greenhouse
+  slug: planetscale
+- name: Neon
+  tier: 2
+  ats: ashby
+  slug: neon
+- name: Docker
+  tier: 2
+  ats: ashby
+  slug: docker
+- name: Sentry
+  tier: 2
+  ats: ashby
+  slug: sentry
+- name: Airtable
+  tier: 2
+  ats: greenhouse
+  slug: airtable
+- name: Brex
+  tier: 2
+  ats: greenhouse
+  slug: brex
+- name: Mercury
+  tier: 2
+  ats: greenhouse
+  slug: mercury
+- name: Modern Treasury
+  tier: 2
+  ats: ashby
+  slug: moderntreasury
+- name: Vanta
+  tier: 2
+  ats: ashby
+  slug: vanta
+- name: Miro
+  tier: 2
+  ats: ashby
+  slug: miro
+- name: Amplitude
+  tier: 2
+  ats: greenhouse
+  slug: amplitude
+- name: Mixpanel
+  tier: 2
+  ats: greenhouse
+  slug: mixpanel
+- name: LaunchDarkly
+  tier: 2
+  ats: greenhouse
+  slug: launchdarkly
+- name: Warp
+  tier: 2
+  ats: greenhouse
+  slug: warp
+- name: Ripple
+  tier: 2
+  ats: greenhouse
+  slug: ripple
+- name: Circle
+  tier: 2
+  ats: ashby
+  slug: circle
+- name: Gemini
+  tier: 2
+  ats: greenhouse
+  slug: gemini
+- name: Fireblocks
+  tier: 2
+  ats: greenhouse
+  slug: fireblocks
+- name: Alchemy
+  tier: 2
+  ats: ashby
+  slug: alchemy
+- name: Consensys
+  tier: 2
+  ats: greenhouse
+  slug: consensys
+- name: Razorpay
+  tier: 1
+  ats: greenhouse
+  slug: razorpaysoftwareprivatelimited
+  regions:
+  - india
+- name: Swiggy
+  tier: 1
+  ats: smartrecruiters
+  slug: swiggy
+  regions:
+  - india
+- name: ServiceNow
+  tier: 1
+  ats: smartrecruiters
+  slug: servicenow
+  regions:
+  - india
+- name: Arista Networks
+  tier: 1
+  ats: smartrecruiters
+  slug: aristanetworks
+  regions:
+  - india
+- name: Agoda
+  tier: 1
+  ats: greenhouse
+  slug: agoda
+  regions:
+  - india
+- name: Freshworks
+  tier: 2
+  ats: smartrecruiters
+  slug: freshworks
+  regions:
+  - india
+- name: Grab
+  tier: 2
+  ats: smartrecruiters
+  slug: grab
+  regions:
+  - india
+- name: Paytm
+  tier: 2
+  ats: lever
+  slug: paytm
+  regions:
+  - india
+- name: Eternal
+  tier: 2
+  ats: lever
+  slug: eternal
+  regions:
+  - india
+- name: Glance
+  tier: 2
+  ats: greenhouse
+  slug: glance
+  regions:
+  - india
+- name: Druva
+  tier: 2
+  ats: greenhouse
+  slug: druva
+  regions:
+  - india
+- name: Hevo Data
+  tier: 2
+  ats: lever
+  slug: hevodata
+  regions:
+  - india
+- name: Level AI
+  tier: 2
+  ats: lever
+  slug: levelai
+  regions:
+  - india
+- name: Composio
+  tier: 2
+  ats: ashby
+  slug: composio
+  regions:
+  - india
+- name: Pocket FM
+  tier: 2
+  ats: lever
+  slug: pocketfm
+  regions:
+  - india
+- name: Whatfix
+  tier: 2
+  ats: smartrecruiters
+  slug: whatfix
+  regions:
+  - india
+- name: Sigmoid
+  tier: 3
+  ats: greenhouse
+  slug: sigmoid
+  regions:
+  - india
+- name: Thoughtworks
+  tier: 3
+  ats: greenhouse
+  slug: thoughtworks
+  regions:
+  - india
+- name: Unacademy
+  tier: 3
+  ats: smartrecruiters
+  slug: unacademy
+  regions:
+  - india
+- name: Cars24
+  tier: 3
+  ats: smartrecruiters
+  slug: cars24
+  regions:
+  - india
+- name: Zepto
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Zomato
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Blinkit
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Nutanix
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Flipkart
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: PhonePe
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Atlassian
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Uber
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Google
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Microsoft
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Dream11
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Dream Sports
+  tier: 1
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Myntra
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Zerodha
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: ShareChat
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Games24x7
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Juspay
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Urban Company
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Rapido
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Nykaa
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Ola
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Udaan
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Lenskart
+  tier: 2
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+- name: Delhivery
+  tier: 3
+  ats: linkedin
+  slug: ''
+  regions:
+  - india
+bot_protected:
+- Google
+- Meta
+- Apple
+- Uber
+- Microsoft
+needs_browser_path:
+- Atlassian
+- Nutanix
+- HashiCorp
+- DoorDash
+- Sprinklr
+- Zerodha
+- BrowserStack
+- Hasura
+- Chargebee
+- Darwinbox
+- Innovaccer
+- Sarvam AI
+- Krutrim
+- Perplexity
+- Mistral
+- Hugging Face
+- Anduril
+- Sierra AI

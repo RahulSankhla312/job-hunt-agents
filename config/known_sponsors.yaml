@@ -1,0 +1,28 @@
+# Companies that visibly sponsor work visas for engineers, used only when a
+# US posting is silent about sponsorship. Seeded from public H-1B filing
+# patterns; treat as a hint, never as a promise - the posting always wins.
+companies:
+  - OpenAI
+  - Anthropic
+  - Databricks
+  - Stripe
+  - Rubrik
+  - Snowflake
+  - Confluent
+  - Coinbase
+  - Airbnb
+  - Datadog
+  - Cloudflare
+  - MongoDB
+  - Dropbox
+  - Pinterest
+  - Instacart
+  - Twilio
+  - Okta
+  - Lyft
+  - Affirm
+  - Asana
+  - Plaid
+  - Robinhood
+  - Scale AI
+  - Figma

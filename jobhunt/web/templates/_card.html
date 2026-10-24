@@ -1,0 +1,135 @@
+{% macro job_card(row, show_actions=True) %}
+{% set job = row.job %}{% set resume = row.resume %}
+{% set skills = (resume.ats_detail or {}).get("matched") if resume else None %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      {% if job.score %}
+      <span class="score {% if job.score < threshold + 0.25 %}mid{% endif %}">{{ "%.2f"|format(job.score) }}</span>
+      {% endif %}
+      {% if job.level_band.value == 'ai_track' %}<span class="badge you">AI track</span>
+      {% elif job.level_band.value == 'stretch' %}<span class="badge review">stretch</span>{% endif %}
+      {% if job.eligibility.value == 'india_eligible' %}<span class="badge done">India</span>
+      {% elif job.eligibility.value == 'sponsorship_offered' %}<span class="badge off">sponsors</span>
+      {% elif job.eligibility.value == 'unknown' %}<span class="badge review">auth unclear</span>{% endif %}
+      {% if row.freshness %}<span class="badge {{ row.freshness[1] }}">{{ row.freshness[0] }}</span>{% endif %}
+      <span class="grow"></span>
+      {% if resume and resume.ats_score %}
+        <span class="badge {% if resume.ats_score >= 0.85 %}done{% else %}review{% endif %}">
+          ATS {{ "%.0f"|format(resume.ats_score * 100) }}%</span>
+      {% else %}
+        <span class="badge off">no resume yet</span>
+      {% endif %}
+    </div>
+
+    <a class="jtitle" href="/job/{{ job.id }}">{{ job.title }}</a>
+    <div class="jsub">
+      {{ job.company }} · {{ job.location or "location not stated" }}
+      {%- if job.comp_min %} · {{ job.comp_currency or "USD" }}
+        {{ "{:,.0f}".format(job.comp_min) }}–{{ "{:,.0f}".format(job.comp_max or job.comp_min) }}
+        {%- if job.comp_is_estimated %} (est){% endif %}
+      {%- elif job.comp_reason %} · {{ job.comp_reason }}{% endif %}
+      · via {{ job.source }}
+    </div>
+
+    {% if skills %}
+      <div class="label">Skills your resume surfaced for this role</div>
+      <div class="chips">
+        {% for skill in skills[:5] %}<span class="chip">{{ skill }}</span>{% endfor %}
+        {% if skills|length > 5 %}<span class="chip more">+{{ skills|length - 5 }}</span>{% endif %}
+      </div>
+    {% endif %}
+
+    {% if row.contacts %}
+      <div class="label">Who could refer you here</div>
+      <div class="chips">
+        {% for c in row.contacts %}
+          {% if c.linkedin_url %}
+            <a class="chip" href="{{ c.linkedin_url }}" target="_blank" rel="noopener"
+               title="{{ c.title or '' }}{% if c.shared_context %} · {{ c.shared_context }}{% endif %}">
+              {{ c.name }}{% if c.connection_degree %} · {{ c.connection_degree }}{{
+                {1:'st',2:'nd',3:'rd'}[c.connection_degree] }}{% endif %}</a>
+          {% else %}
+            <span class="chip">{{ c.name }}{% if c.title %} · {{ c.title[:28] }}{% endif %}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if is_blocked(job) %}
+      <div class="blocked">
+        <b>This one stopped before applying.</b>
+        {{ job.status_reason }}
+        <span class="hint">Approving again retries it.</span>
+      </div>
+    {% endif %}
+
+    {% if row.resume_stale %}
+      <div class="blocked">
+        <b>This resume is out of date.</b>
+        It was written before your current resume layout or profile ({{ row.resume_stale }}).
+        It will not be sent: applying rewrites it first.
+        <form method="post" action="/job/{{ job.id }}/tailor" class="inline" style="margin-top:8px"
+              onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Rewriting… (~1 min)'">
+          <button type="submit">Rewrite resume now</button>
+        </form>
+      </div>
+    {% endif %}
+
+    {% if job.score_summary %}<div class="summary">{{ job.score_summary }}</div>{% endif %}
+
+    {% if show_actions %}
+    <div class="actions">
+      <a class="btn" href="{{ job.url }}" target="_blank" rel="noopener">Posting</a>
+      {% if resume %}<a class="btn" href="/resume/{{ resume.id }}" target="_blank">{{ "Old resume" if row.resume_stale else "Resume" }}</a>{% endif %}
+
+
+      {% set site = manual_apply_site(job) %}
+      {% if site %}
+      <a class="btn primary-link" href="{{ job.url }}" target="_blank" rel="noopener">Apply on {{ site }}</a>
+      <form method="post" action="/job/{{ job.id }}/decision" class="inline">
+        <button name="action" value="applied">Mark applied</button>
+        <button class="danger" name="action" value="reject">Reject</button>
+      </form>
+    </div>
+    <div class="meta" style="margin-top:8px">
+      Found on {{ site }}. Apply there yourself &mdash; {{ site }} does not allow automated applications,
+      and its apply link needs your login. Then press <b>Mark applied</b> to track it.
+    </div>
+      {% else %}
+      {#- Fills the form in a window you can see, then waits for you to press
+          Submit. Ashby refuses automated submissions as spam, so the part
+          carrying your name is yours to click. -#}
+      <form method="post" action="/job/{{ job.id }}/handover" class="inline">
+        <button class="primary">Fill it &amp; let me submit</button>
+      </form>
+      {# Approve runs the whole chain: resume, cover letter, then the form. #}
+      <form method="post" action="/job/{{ job.id }}/decision" class="inline">
+        {#- Tailors, fills and sends. The click is the consent; the
+            evening scheduler still obeys shadow mode. -#}
+        <button name="action" value="approve">Approve &amp; apply</button>
+        <button name="action" value="applied">Mark applied</button>
+        {% if resume %}<button name="action" value="retailor">Re-tailor</button>{% endif %}
+        <button class="danger" name="action" value="reject">Reject</button>
+      </form>
+      {% if resume %}
+        <form method="post" action="/job/{{ job.id }}/apply" class="inline">
+          <button>{% if shadow_mode %}Re-fill form{% else %}Apply now{% endif %}</button>
+        </form>
+      {% endif %}
+    </div>
+    <div class="meta" style="margin-top:8px">
+      Writes the resume and cover letter, fills the form, and <b>submits it</b> if
+      every required question could be answered. Anything it could not answer is
+      filled and screenshotted instead, with the reason shown here — a
+      half-finished application is worse than none.
+      {% if shadow_mode %}
+        <b>Shadow mode</b> still stops the nightly run from sending on its own.
+      {% endif %}
+      <span style="opacity:.75">Takes ~40s.</span>
+    </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

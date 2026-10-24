@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Connections{% endblock %}
+{% block body %}
+
+{% macro pill(st, ok_text="Connected", bad_text="Not working", idle_text="Not checked") -%}
+  {% if st.running %}<span class="state busy"><span class="dot-live"></span>{{ "Waiting for you" if st.action == "sign-in" or st.action == "connect" else "Checking" }}…</span>
+  {% elif st.ok %}<span class="state ok">{{ ok_text }}</span>
+  {% elif st.ok is sameas false %}<span class="state bad">{{ bad_text }}</span>
+  {% else %}<span class="state idle">{{ idle_text }}</span>{% endif %}
+{%- endmacro %}
+
+<div class="page-head">
+  <div>
+    <h1>Connections</h1>
+    <p>The accounts the agents work through. Only the AI engine is required; LinkedIn and Gmail unlock referrals and recruiter email.
+      You sign in yourself in a real browser window — no password is ever typed, read or stored by this app.</p>
+  </div>
+</div>
+
+{% include "_messages.html" %}
+
+<div class="frame section"><div class="panel">
+  <div class="card-top"><h2 style="margin:0">AI engine</h2><span class="grow"></span>{{ pill(status.ai, "Working") }}</div>
+  <p class="sub">Reads your resume, scores jobs, and writes tailored resumes and letters. Required.</p>
+  <dl class="kv">
+    <dt>Engine</dt><dd>{{ "Claude Code (your Claude subscription)" if ai.backend == "claude_cli" else "Anthropic API key" }}</dd>
+    {% if ai.backend == "claude_cli" %}
+    <dt>Claude Code CLI</dt><dd>{% if ai.cli_path %}<code>{{ ai.cli_path }}</code>{% else %}<span style="color:var(--bad)">not found</span> — install Claude Code, or switch to an API key{% endif %}</dd>
+    {% else %}
+    <dt>API key</dt><dd>{{ "saved" if ai.api_key_set else "not set" }}</dd>
+    {% endif %}
+    {% if status.ai.message %}<dt>Last test</dt><dd>{{ status.ai.message }}{% if status.ai.checked_at %} <span class="meta">({{ status.ai.checked_at|localtime }})</span>{% endif %}</dd>{% endif %}
+  </dl>
+  <form method="post" action="/connections/ai" style="margin-top:14px">
+    {% if onboarding %}<input type="hidden" name="onboarding" value="1">{% endif %}
+    <div class="fields">
+      <div class="field"><span class="lbl">Use</span>
+        <label class="check" style="padding:4px 0"><input type="radio" name="backend" value="claude_cli" {% if ai.backend == "claude_cli" %}checked{% endif %}> Claude Code on my subscription</label>
+        <label class="check" style="padding:4px 0"><input type="radio" name="backend" value="anthropic_api" {% if ai.backend == "anthropic_api" %}checked{% endif %}> Anthropic API key (pay per use)</label></div>
+      <div class="field"><label for="api_key">Anthropic API key</label>
+        <input type="password" id="api_key" name="api_key" autocomplete="off" placeholder="{{ 'saved — leave blank to keep' if ai.api_key_set else 'sk-ant-...' }}">
+        <div class="hint">Stored only in this machine's <code>.env</code> file.</div></div>
+      <div class="field"><label for="cli_path">Claude Code CLI path (optional)</label>
+        <input type="text" id="cli_path" name="cli_path" placeholder="found automatically">
+        <div class="hint">Only if it was not found automatically.</div></div>
+    </div>
+    <div class="actions">
+      <button type="submit" class="primary" {% if status.ai.running %}disabled{% endif %}>Save and test</button>
+      <button type="submit" formaction="/connections/ai/check" {% if status.ai.running %}disabled{% endif %}>Test now</button>
+      {% if is_windows and ai.backend == "claude_cli" and ai.cli_path %}
+      <button type="submit" formaction="/connections/ai/claude-login">Open Claude sign-in window</button>
+      {% endif %}
+    </div>
+  </form>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <div class="card-top"><h2 style="margin:0">LinkedIn <span class="count">(optional)</span></h2><span class="grow"></span>{{ pill(status.linkedin, "Signed in", "Not signed in") }}</div>
+  <p class="sub">Finds people at each company who could refer you, and drafts the ask. Read-only and rate-limited;
+    messages are only ever drafted for you to send yourself.</p>
+  {% if status.linkedin.message %}<p class="meta">{{ status.linkedin.message }}{% if status.linkedin.checked_at %} ({{ status.linkedin.checked_at|localtime }}){% endif %}</p>{% endif %}
+  <form method="post" class="actions">
+    {% if onboarding %}<input type="hidden" name="onboarding" value="1">{% endif %}
+    {% if status.linkedin.running and status.linkedin.action == "sign-in" %}
+      <span class="meta">A browser window is open on LinkedIn — sign in there. This page updates by itself.</span>
+      <button type="submit" formaction="/connections/linkedin/cancel">Cancel</button>
+    {% else %}
+      <button type="submit" class="primary" formaction="/connections/linkedin/signin" {% if status.linkedin.running %}disabled{% endif %}>{{ "Sign in again" if status.linkedin.ok else "Sign in to LinkedIn" }}</button>
+      <button type="submit" formaction="/connections/linkedin/check" {% if status.linkedin.running %}disabled{% endif %}>Check status</button>
+    {% endif %}
+  </form>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <div class="card-top"><h2 style="margin:0">Gmail <span class="count">(optional)</span></h2><span class="grow"></span>
+    {% if status.gmail.running %}{{ pill(status.gmail) }}{% elif gmail_ok %}<span class="state ok">Connected</span>{% else %}<span class="state idle">Not connected</span>{% endif %}</div>
+  <p class="sub">Sends recruiter emails you approved (max per day on the Filters page) and reads replies to track your applications. Two permissions only: send, and read.</p>
+  <ol class="meta" style="padding-left:18px;margin:0 0 12px">
+    <li>In <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console</a>, enable the Gmail API and create an OAuth client of type <b>Desktop app</b>. Download its JSON.</li>
+    <li>Upload that file here{% if gmail_secret %} <span class="state ok">uploaded</span>{% endif %}.</li>
+    <li>Press <b>Connect Gmail</b> and approve access in the tab that opens.</li>
+  </ol>
+  {% if status.gmail.message %}<p class="meta">{{ status.gmail.message }}</p>{% elif gmail_detail and not gmail_ok %}<p class="meta">{{ gmail_detail }}</p>{% endif %}
+  <form method="post" action="/connections/gmail/secret" enctype="multipart/form-data" class="filterbar">
+    {% if onboarding %}<input type="hidden" name="onboarding" value="1">{% endif %}
+    <input type="file" name="secret" accept="application/json,.json" required aria-label="OAuth client JSON">
+    <button type="submit">Upload</button>
+  </form>
+  <form method="post" class="actions">
+    {% if onboarding %}<input type="hidden" name="onboarding" value="1">{% endif %}
+    <button type="submit" class="primary" formaction="/connections/gmail/connect" {% if not gmail_secret or status.gmail.running %}disabled{% endif %}>Connect Gmail</button>
+    {% if gmail_ok %}<button type="submit" class="danger" formaction="/connections/gmail/disconnect">Disconnect</button>{% endif %}
+  </form>
+</div></div>
+
+{% if onboarding %}
+<div class="savebar">
+  <small>You can come back to this page any time from <b>Connections</b>.</small>
+  <span class="grow"></span>
+  <a class="btn" href="/filters?onboarding=1">&larr; Back</a>
+  <a class="btn primary-link" href="/runs?welcome=1">Continue &rarr;</a>
+</div>
+{% endif %}
+
+{% if busy %}
+<script>
+  // Something is running in the background; refresh when it finishes.
+  (function poll() {
+    fetch("/connections/status").then(r => r.json()).then(s => {
+      if (Object.values(s).some(x => x.running)) setTimeout(poll, 2500);
+      else location.reload();
+    }).catch(() => setTimeout(poll, 5000));
+  })();
+</script>
+{% endif %}
+{% endblock %}

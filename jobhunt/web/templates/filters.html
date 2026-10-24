@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Job filters{% endblock %}
+{% block body %}
+{% set comp = t.compensation or {} %}
+{% set level = t.level or {} %}
+{% set auto = t.autonomy or {} %}
+{% set limits = t.limits or {} %}
+{% set sched = t.schedule or {} %}
+
+<div class="page-head">
+  <div>
+    <h1>Job filters</h1>
+    <p>What counts as a job worth your time, how much the agents may do on their own, and when they run.
+      Changing the pay floor, titles or score bar re-applies the filters to every job already found — for free, no AI calls.</p>
+  </div>
+</div>
+
+{% include "_messages.html" %}
+
+<form method="post" action="/filters" novalidate>
+{% if onboarding %}<input type="hidden" name="onboarding" value="1">{% endif %}
+
+<div class="frame section"><div class="panel">
+  <h2>Pay floor</h2>
+  <p class="sub">Jobs estimated below these are dropped before any AI scoring. Jobs with no published pay pass at top-tier companies, marked "estimated".</p>
+  <div class="fields">
+    <div class="field"><label for="t_india_min_ctc_lpa">Minimum CTC in India (LPA)</label>
+      <input type="number" step="0.5" min="0" id="t_india_min_ctc_lpa" name="t_india_min_ctc_lpa" value="{{ comp.india_min_ctc_lpa if comp.india_min_ctc_lpa is not none else '' }}"></div>
+    <div class="field"><label for="t_us_remote_min_usd">Minimum base for US / remote (USD per year)</label>
+      <input type="number" step="1000" min="0" id="t_us_remote_min_usd" name="t_us_remote_min_usd" value="{{ comp.us_remote_min_usd if comp.us_remote_min_usd is not none else '' }}"></div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>Roles</h2>
+  <p class="sub">One title per line, matched as words inside the posting's title (case does not matter).</p>
+  <div class="fields">
+    <div class="field"><label for="t_direct_titles">Target titles <span class="req">*</span></label>
+      <textarea id="t_direct_titles" name="t_direct_titles" rows="8">{{ (level.direct_titles or [])|join("\n") }}</textarea>
+      <div class="hint">Roles that fit your experience outright.</div></div>
+    <div class="field"><label for="t_stretch_titles">Stretch titles</label>
+      <textarea id="t_stretch_titles" name="t_stretch_titles" rows="8">{{ (level.stretch_titles or [])|join("\n") }}</textarea>
+      <div class="hint">One level up. Kept only if the posting's required years pass.</div></div>
+    <div class="field"><label for="t_ai_track_titles">AI / ML titles</label>
+      <textarea id="t_ai_track_titles" name="t_ai_track_titles" rows="8">{{ (level.ai_track_titles or [])|join("\n") }}</textarea>
+      <div class="hint">Scored on fit, not title level. Clear this to skip the AI track.</div></div>
+    <div class="field"><label for="t_reject_titles">Never show titles containing</label>
+      <textarea id="t_reject_titles" name="t_reject_titles" rows="8">{{ (level.reject_titles or [])|join("\n") }}</textarea></div>
+    <div class="field"><label for="t_max_years_required">Max years of experience a posting may ask for</label>
+      <input type="number" min="0" step="1" id="t_max_years_required" name="t_max_years_required" value="{{ level.max_years_required if level.max_years_required is not none else '' }}"></div>
+    <div class="field"><label for="t_max_level_number">Highest numbered level (e.g. 2 = "Engineer II")</label>
+      <input type="number" min="1" step="1" id="t_max_level_number" name="t_max_level_number" value="{{ level.max_level_number if level.max_level_number is not none else '' }}"></div>
+  </div>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>Match score</h2>
+  <p class="sub">Every job that passes the filters is scored 1–5 for fit by the AI. Jobs at or above this bar reach your Queue; the rest go to Archive with a reason.</p>
+  <div class="fields">
+    <div class="field"><label for="t_apply_threshold">Minimum score</label>
+      <input type="number" min="1" max="5" step="0.05" id="t_apply_threshold" name="t_apply_threshold" value="{{ (t.scoring or {}).apply_threshold }}"></div>
+    <div class="field"><label for="t_score_per_run">Jobs scored per run</label>
+      <input type="number" min="5" max="500" step="5" id="t_score_per_run" name="t_score_per_run" value="{{ (t.scoring or {}).per_run or 40 }}">
+      <div class="hint">Five jobs per AI call. Your tracked companies are scored first.</div></div>
+  </div>
+</div></div>
+
+{% set li = (t.sources or {}).linkedin or {} %}
+{% set wf = (t.sources or {}).wellfound or {} %}
+<div class="frame section" id="sources"><div class="panel">
+  <h2>Where to look</h2>
+  <p class="sub">Company career boards are always searched. These add job posts from elsewhere &mdash; including roles
+    shared on LinkedIn before (or instead of) a careers page.</p>
+  <input type="hidden" name="t_sources_present" value="1">
+  <label class="check"><input type="checkbox" name="t_linkedin_enabled" {% if li.enabled is not sameas false %}checked{% endif %}>
+    <span><b>LinkedIn job posts</b><small>LinkedIn's public job search, logged out &mdash; your LinkedIn account is never used for this.
+      Slow and capped per run. Jobs found here are applied to on LinkedIn by you.</small></span></label>
+  <label class="check"><input type="checkbox" name="t_wellfound_enabled" {% if wf.enabled is not sameas false %}checked{% endif %}>
+    <span><b>Wellfound startup jobs</b><small>Indian startups, often with the salary range posted.</small></span></label>
+  <div class="fields" style="margin-top:8px">
+    <div class="field"><label for="t_watch_companies">Companies to watch on LinkedIn</label>
+      <textarea id="t_watch_companies" name="t_watch_companies" rows="8">{{ (li.watch_companies or [])|join("\n") }}</textarea>
+      <div class="hint">Searched by name every run, first. Add companies whose careers site the app cannot read.</div></div>
+    <div class="field"><label for="t_linkedin_keywords">LinkedIn search terms</label>
+      <textarea id="t_linkedin_keywords" name="t_linkedin_keywords" rows="8">{{ (li.keywords or [])|join("\n") }}</textarea>
+      <div class="hint">One per line, searched across {{ li.location or "India" }}, posted in the last {{ li.posted_within_days or 7 }} days.</div></div>
+    <div class="field"><label for="t_skip_companies">Never show jobs from</label>
+      <textarea id="t_skip_companies" name="t_skip_companies" rows="8">{{ (t.skip_companies or [])|join("\n") }}</textarea>
+      <div class="hint">Matched as whole words: "Infosys" also hides "Infosys BPM".</div></div>
+  </div>
+</div></div>
+
+{% set rmode = (t.resume or {}).mode or "tailored" %}
+<div class="frame section" id="resume"><div class="panel">
+  <h2>Resume sent with applications</h2>
+  <p class="sub">Tailoring rewrites your resume for each job from your profile &mdash; reordered and rephrased
+    to match the posting, never adding anything you did not write, and fact-checked. Or send your own PDF exactly as it is.</p>
+  <input type="hidden" name="t_resume_mode_present" value="1">
+  <label class="check"><input type="radio" name="t_resume_mode" value="tailored" {% if rmode != "original" %}checked{% endif %}>
+    <span><b>Tailor it for each job</b><small>Better keyword match with applicant-tracking systems. One AI call per job.</small></span></label>
+  <label class="check"><input type="radio" name="t_resume_mode" value="original" {% if rmode == "original" %}checked{% endif %}>
+    <span><b>Always send my own resume, unchanged</b><small>Exactly the PDF below, for every application. No AI rewriting.</small></span></label>
+  <div class="filterbar" style="margin:10px 0 0">
+    <span class="meta" style="margin:0">
+      {% if resume_file %}Your resume PDF: {{ resume_file.size_kb }} KB, uploaded {{ resume_file.uploaded|localtime }} &middot;
+        <a href="/filters/resume.pdf" target="_blank">open it</a>
+      {% else %}<b style="color:var(--bad)">No resume PDF uploaded yet.</b>{% endif %}
+    </span>
+    <input type="file" name="resume" accept="application/pdf,.pdf" form="resume-upload" aria-label="Resume PDF to send" required>
+    <button type="submit" form="resume-upload">{{ "Replace PDF" if resume_file else "Upload PDF" }}</button>
+  </div>
+</div></div>
+
+<div class="frame section" id="autonomy"><div class="panel">
+  <h2>What the agents may do on their own</h2>
+  <input type="hidden" name="t_autonomy_present" value="1">
+  <label class="check"><input type="checkbox" name="t_shadow_mode" {% if auto.shadow_mode %}checked{% endif %}>
+    <span><b>Practice mode</b> (recommended to start)<small>The scheduled runs fill application forms and screenshot them, but never submit an application or send an email. You review everything and submit from the dashboard.</small></span></label>
+  <label class="check"><input type="checkbox" name="t_auto_submit_clean_ats" {% if auto.auto_submit_clean_ats %}checked{% endif %}>
+    <span>In live mode, submit clean applications automatically<small>Only Greenhouse, Ashby and Lever forms where every required question was answered from your profile. Anything else waits for you.</small></span></label>
+  <label class="check"><input type="checkbox" name="t_write_cover_letter" {% if auto.write_cover_letter %}checked{% endif %}>
+    <span>Write a cover letter for each application<small>Fact-checked against your profile, like the resume.</small></span></label>
+</div></div>
+
+<div class="frame section"><div class="panel">
+  <h2>Daily limits</h2>
+  <div class="fields">
+    <div class="field"><label for="t_applications_per_day">Applications per day</label>
+      <input type="number" min="0" step="1" id="t_applications_per_day" name="t_applications_per_day" value="{{ limits.applications_per_day if limits.applications_per_day is not none else '' }}"></div>
+    <div class="field"><label for="t_applications_per_company">Open applications per company</label>
+      <input type="number" min="0" step="1" id="t_applications_per_company" name="t_applications_per_company" value="{{ limits.applications_per_company if limits.applications_per_company is not none else '' }}">
+      <div class="hint">0 = no limit. Forty applications to one company reads as spam.</div></div>
+    <div class="field"><label for="t_cold_emails_per_day">Recruiter emails per day</label>
+      <input type="number" min="0" step="1" id="t_cold_emails_per_day" name="t_cold_emails_per_day" value="{{ limits.cold_emails_per_day if limits.cold_emails_per_day is not none else '' }}"></div>
+  </div>
+</div></div>
+
+<div class="frame section" id="schedule"><div class="panel">
+  <h2>Daily schedule</h2>
+  <p class="sub">Morning finds and prepares jobs; evening applies and follows up. The schedule runs while this dashboard is running.</p>
+  <input type="hidden" name="t_schedule_present" value="1">
+  <label class="check"><input type="checkbox" name="t_schedule_enabled" {% if sched.enabled %}checked{% endif %}>
+    <span>Run automatically every day</span></label>
+  <div class="fields">
+    <div class="field"><label for="t_morning">Morning run</label>
+      <input type="time" id="t_morning" name="t_morning" value="{{ times[0] }}"></div>
+    <div class="field"><label for="t_evening">Evening run</label>
+      <input type="time" id="t_evening" name="t_evening" value="{{ times[1] }}"></div>
+    <div class="field"><label for="t_timezone">Timezone</label>
+      <input type="text" id="t_timezone" name="t_timezone" value="{{ times[2] }}" list="tz-options">
+      <datalist id="tz-options">{% for tz in timezones %}<option value="{{ tz }}">{% endfor %}</datalist></div>
+  </div>
+</div></div>
+
+<div class="savebar">
+  {% if customised and not onboarding %}
+  <button type="submit" form="reset-form" class="danger" onclick="return confirm('Put every filter back to the shipped defaults?')">Reset to defaults</button>
+  {% endif %}
+  <span class="grow"></span>
+  {% if onboarding %}<a class="btn" href="/setup">&larr; Back</a>{% endif %}
+  <button type="submit" class="primary">{% if onboarding %}Save and continue &rarr;{% else %}Save filters{% endif %}</button>
+</div>
+</form>
+<form method="post" action="/filters/reset" id="reset-form"></form>
+<form method="post" action="/filters/resume" enctype="multipart/form-data" id="resume-upload"></form>
+{% endblock %}

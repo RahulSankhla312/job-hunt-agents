@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "_card.html" import job_card with context %}
+{% block title %}Queue{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Queue</h1>
+    <p>What the last run found, and what it needs from you.
+      {% if last_run %}Last run: {{ last_run.started_at|localtime }}.{% endif %}</p>
+  </div>
+  <span class="grow"></span>
+  <form method="post" action="/runs/start" class="inline">
+    <input type="hidden" name="which" value="morning">
+    <button type="submit" class="primary" {% if busy %}disabled title="A run is in progress"{% endif %}>
+      {% if busy %}Run in progress…{% else %}Find jobs now{% endif %}</button>
+  </form>
+  <a class="btn" href="/applied">View applied</a>
+</div>
+
+<div class="chips" style="margin:-6px 0 14px;align-items:center">
+  <span class="label" style="margin:0 4px 0 0">Your filters</span>
+  {% for f in filters %}<span class="chip">{{ f }}</span>{% endfor %}
+  <a class="chip more" href="/filters">Edit filters</a>
+</div>
+
+<form method="get" action="/" class="filterbar" role="search">
+  <input type="text" name="q" value="{{ search.q }}" placeholder="Search title or company" aria-label="Search title or company">
+  <input type="text" name="location" value="{{ search.location }}" placeholder="Location" aria-label="Location" class="narrow">
+  <input type="number" name="min_score" value="{{ search.min_score }}" placeholder="Min score" step="0.05" min="1" max="5" aria-label="Minimum score" class="narrow">
+  <button type="submit">Search</button>
+  {% if searching %}<a class="btn" href="/">Clear</a>{% endif %}
+</form>
+
+<div class="stats">
+  <div class="stat {% if counts.queued %}hot{% endif %}"><b>{{ counts.queued }}</b><span>needs you</span></div>
+  <div class="stat"><b>{{ counts.ready }}</b><span>ready</span></div>
+  <div class="stat"><b>{{ scored_india|length }}</b><span>India matches</span></div>
+  <div class="stat"><b>{{ counts.scored }}</b><span>above bar</span></div>
+  <div class="stat"><b>{{ counts.pending_referrals }}</b><span>referrals</span></div>
+  <div class="stat"><b>{{ counts.applied }}</b><span>applied</span></div>
+  <div class="stat"><b>{{ counts.total }}</b><span>sourced</span></div>
+</div>
+
+{% if counts.total == 0 %}
+<div class="empty">
+  {% if busy %}
+  <b>Your search is running.</b> Jobs appear here as each step finishes — follow it on
+  <a href="/runs">Runs</a>. The first run takes 10–30 minutes.
+  {% else %}
+  <b>No jobs yet.</b> Press <b>Find jobs now</b> to run your first search, or open
+  <a href="/runs">Runs</a> to follow along. The first run takes 10–30 minutes.
+  {% endif %}
+</div>
+{% endif %}
+
+{% if queued %}
+<h2>Needs your decision <span class="count">{{ queued|length }}</span></h2>
+<div class="grid2">{% for row in queued %}{{ job_card(row) }}{% endfor %}</div>
+{% endif %}
+
+{% if ready %}
+<h2>Tailored and ready to apply <span class="count">{{ ready|length }}</span></h2>
+<div class="grid2">{% for row in ready %}{{ job_card(row) }}{% endfor %}</div>
+{% endif %}
+
+{% if counts.total %}
+<h2>Above your bar — India-eligible, no resume yet
+  <span class="count">{{ scored_india|length }}</span></h2>
+{% if scored_india %}
+  <p class="meta" style="margin:-6px 0 12px">
+    Open a job and press <b>Write resume</b>, or approve it to write the resume and apply in one go.
+    The morning run also tailors the top few automatically.
+  </p>
+  <div class="grid2">{% for row in scored_india %}{{ job_card(row) }}{% endfor %}</div>
+{% elif searching %}
+  <div class="empty">Nothing matches that search.</div>
+{% else %}
+  <div class="empty">Nothing above your bar yet. The next run scores more jobs — or lower the bar on <a href="/filters">Filters</a>.</div>
+{% endif %}
+{% endif %}
+
+{% if scored_other %}
+<h2>Above your bar — sponsoring or unclear <span class="count">{{ scored_other|length }}</span></h2>
+<div class="grid2">{% for row in scored_other %}{{ job_card(row) }}{% endfor %}</div>
+{% endif %}
+
+{% endblock %}

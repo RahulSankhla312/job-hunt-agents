@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}{{ job.company }} — {{ job.title }}{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>{{ job.title }}</h1>
+    <p>{{ job.company }} · {{ job.location or "location not stated" }}
+      {%- if job.remote %} · remote{% endif %}
+      · via {{ job.source }}{% if job.ats %} ({{ job.ats }}){% endif %}
+      {%- if job.posted_at %} · posted {{ job.posted_at.strftime("%d %b %Y") }}{% endif %}</p>
+  </div>
+  <span class="grow"></span>
+  <a class="btn" href="/">Back to queue</a>
+</div>
+
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      {% if job.score %}
+      <span class="score {% if job.score < threshold + 0.25 %}mid{% endif %}">{{ "%.2f"|format(job.score) }}</span>
+      {% endif %}
+      <span class="badge off">{{ job.status.value.replace("_", " ") }}</span>
+      {% if job.level_band.value == 'ai_track' %}<span class="badge you">AI track</span>
+      {% elif job.level_band.value == 'stretch' %}<span class="badge review">stretch</span>{% endif %}
+      {% if job.eligibility.value == 'india_eligible' %}<span class="badge done">India</span>
+      {% elif job.eligibility.value == 'sponsorship_offered' %}<span class="badge off">sponsors</span>{% endif %}
+    </div>
+
+    {% if is_blocked(job) %}
+      <div class="blocked">
+        <b>This one stopped before applying.</b>
+        {{ job.status_reason }}
+        <span class="hint">Approving again retries it.</span>
+      </div>
+    {% endif %}
+
+    {% if resume_stale %}
+      <div class="blocked">
+        <b>This resume is out of date.</b>
+        It was written before your current resume layout or profile ({{ resume_stale }}).
+        It will not be sent: Approve, Apply and "Fill it" all rewrite it first.
+        <form method="post" action="/job/{{ job.id }}/tailor" class="inline" style="margin-top:8px"
+              onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Rewriting… (~1 min)'">
+          <button type="submit">Rewrite resume now</button>
+        </form>
+      </div>
+    {% endif %}
+
+    {% if job.score_summary %}<div class="summary">{{ job.score_summary }}</div>{% endif %}
+
+    <div class="actions">
+      <a class="btn" href="{{ job.url }}" target="_blank" rel="noopener">Open posting</a>
+      {% if resume %}<a class="btn" href="/resume/{{ resume.id }}" target="_blank">{{ "Open old resume" if resume_stale else "Open resume" }}</a>{% endif %}
+      {% set site = manual_apply_site(job) %}
+      {% if site %}
+      <a class="btn primary-link" href="{{ job.url }}" target="_blank" rel="noopener">Apply on {{ site }}</a>
+      <form method="post" action="/job/{{ job.id }}/decision" class="inline">
+        <button name="action" value="applied">Mark applied</button>
+        <button class="danger" name="action" value="reject">Reject</button>
+      </form>
+      {% if not resume %}
+        <form method="post" action="/job/{{ job.id }}/tailor" class="inline"
+              onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Preparing…'">
+          <button>Prepare resume</button>
+        </form>
+      {% endif %}
+    </div>
+    <div class="meta" style="margin-top:8px">
+      Found on {{ site }}. Apply there yourself &mdash; {{ site }} does not allow automated applications,
+      and its apply link needs your login. Then press <b>Mark applied</b> to track it.
+    </div>
+      {% else %}
+      {#- Fills the form in a window you can see, then waits for you to press
+          Submit. Ashby refuses automated submissions as spam, so the part
+          carrying your name is yours to click. -#}
+      <form method="post" action="/job/{{ job.id }}/handover" class="inline">
+        <button class="primary">Fill it &amp; let me submit</button>
+      </form>
+      <form method="post" action="/job/{{ job.id }}/decision" class="inline">
+        {#- Tailors, fills and sends. The click is the consent; the
+            evening scheduler still obeys shadow mode. -#}
+        <button name="action" value="approve">Approve &amp; apply</button>
+        <button name="action" value="applied">Mark applied</button>
+        {% if resume %}<button name="action" value="retailor">Re-tailor</button>{% endif %}
+        <button class="danger" name="action" value="reject">Reject</button>
+      </form>
+      {% if resume %}
+        <form method="post" action="/job/{{ job.id }}/apply" class="inline">
+          <button>{% if shadow_mode %}Re-fill form{% else %}Apply now{% endif %}</button>
+        </form>
+      {% else %}
+        <form method="post" action="/job/{{ job.id }}/tailor" class="inline"
+              onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Writing… (~1 min)'">
+          <button>Write resume</button>
+        </form>
+      {% endif %}
+    </div>
+    <div class="meta" style="margin-top:8px">
+      Writes the resume and cover letter, fills the form, and <b>submits it</b> if
+      every required question could be answered. Anything it could not answer is
+      filled and screenshotted instead, with the reason shown here — a
+      half-finished application is worse than none.
+      {% if shadow_mode %}<b>Shadow mode</b> still stops the nightly run from
+      sending on its own.{% endif %} Takes ~40s.
+    </div>
+      {% endif %}
+  </div>
+</div>
+
+<h2>Why it scored this way</h2>
+<div class="frame">
+  <div class="panel">
+    {% set dims = (job.score_detail or {}).get("dimensions", {}) %}
+    {% if dims %}
+    <div class="scroll"><table>
+      <thead><tr>{% for k in dims %}<th>{{ k.replace("_", " ") }}</th>{% endfor %}</tr></thead>
+      <tbody><tr>{% for k, v in dims.items() %}
+        <td><span class="score {% if v|int <= 2 %}mid{% endif %}">{{ v }}</span></td>{% endfor %}</tr></tbody>
+    </table></div>
+    {% else %}<div class="jsub">Not scored yet.</div>{% endif %}
+    <div class="meta" style="margin-top:14px;line-height:1.85">
+      <div><b>Level:</b> {{ job.level_band.value }} — {{ job.level_reason or "—" }}</div>
+      <div><b>Work authorisation:</b> {{ job.eligibility.value.replace("_", " ") }} — {{ job.eligibility_reason or "—" }}</div>
+      <div><b>Pay:</b> {{ job.comp_reason or "not assessed" }}</div>
+      {% if job.status_reason %}<div><b>Status:</b> {{ job.status_reason }}</div>{% endif %}
+    </div>
+  </div>
+</div>
+
+{% if resume %}
+<h2>{{ "Your resume (sent unchanged)" if (resume.ats_detail or {}).get("kind") == "original" else "Tailored resume" }}</h2>
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      <span class="badge {% if resume.ats_score and resume.ats_score >= 0.85 %}done{% else %}review{% endif %}">
+        surfaced {{ "%.0f"|format((resume.ats_score or 0) * 100) }}%</span>
+      {% set d = resume.ats_detail or {} %}
+      {% if d.jd_skill_match is defined %}
+        <span class="badge off">JD fit {{ "%.0f"|format(d.jd_skill_match * 100) }}%</span>{% endif %}
+      {% if d.pages %}<span class="badge off">{{ d.pages }} page{{ "s" if d.pages > 1 }}</span>{% endif %}
+      {% if d.kind == "original" %}<span class="badge you">your own PDF</span>{% elif resume.truthfulness_passed %}<span class="badge done">fact-checked</span>{% endif %}
+    </div>
+    {% if resume.changes_summary %}
+      <div class="summary">{{ resume.changes_summary }}</div>{% endif %}
+    {% if d.matched %}
+      <div class="label">Surfaced</div>
+      <div class="chips">{% for m in d.matched %}<span class="chip">{{ m }}</span>{% endfor %}</div>
+    {% endif %}
+    {% if d.unmet %}
+      <div class="label">Asked for but not in your profile</div>
+      <div class="chips">{% for m in d.unmet %}<span class="chip more">{{ m }}</span>{% endfor %}</div>
+    {% endif %}
+    <div class="actions">
+      <a class="btn" href="/resume/{{ resume.id }}" target="_blank">Open PDF</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if referrals %}
+<h2>Referrals</h2>
+{% for ref in referrals %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      <span class="badge off">{{ ref.status.value }}</span>
+      {% if ref.sla_deadline %}<span class="badge review">
+        reply by {{ ref.sla_deadline.strftime("%d %b %H:%M") }}</span>{% endif %}
+    </div>
+    <form method="post" action="/referral/{{ ref.id }}/decision">
+      <textarea name="message" rows="4">{{ ref.message }}</textarea>
+      <div class="actions">
+        <button class="primary" name="action" value="approve">Approve</button>
+        <button name="action" value="sent">Mark sent</button>
+        <button class="danger" name="action" value="reject">Skip</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if applications %}
+<h2>Applications</h2>
+{% for a in applications %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      <span class="stamp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+        {{ a.applied_at.strftime("%b %d, %Y %H:%M") }}
+      </span>
+      <span class="grow"></span>
+      <span class="badge off">{{ a.status.replace("_", " ") }}</span>
+      <span class="badge off">{{ a.method }}</span>
+    </div>
+    {% if a.notes %}<div class="jsub" style="margin-top:8px">{{ a.notes }}</div>{% endif %}
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<h2>Job description</h2>
+<div class="frame">
+  <div class="panel">
+    <div style="white-space:pre-wrap;font-size:13.5px;color:var(--ink-2);max-height:460px;overflow:auto">{{ job.description or "No description captured." }}</div>
+  </div>
+</div>
+
+{% endblock %}

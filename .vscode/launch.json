@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "doctor",      "type": "debugpy", "request": "launch", "program": "${workspaceFolder}/run.py",
+      "args": ["doctor"], "console": "integratedTerminal", "justMyCode": false },
+    { "name": "onboard",     "type": "debugpy", "request": "launch", "program": "${workspaceFolder}/run.py",
+      "args": ["onboard"], "console": "integratedTerminal", "justMyCode": false },
+    { "name": "source --dry-run", "type": "debugpy", "request": "launch", "program": "${workspaceFolder}/run.py",
+      "args": ["source", "--dry-run"], "console": "integratedTerminal", "justMyCode": false },
+    { "name": "score --explain",  "type": "debugpy", "request": "launch", "program": "${workspaceFolder}/run.py",
+      "args": ["score", "--limit", "10", "--explain"], "console": "integratedTerminal", "justMyCode": false },
+    { "name": "web",         "type": "debugpy", "request": "launch", "program": "${workspaceFolder}/run.py",
+      "args": ["web"], "console": "integratedTerminal", "justMyCode": false }
+  ]
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Something went wrong</title>
+<style>
+  :root { --bg: #f5f4f8; --surface: #fff; --ink: #2a2b2f; --muted: #5c5b67; --bad: #d9455f; --line: #e8e8f2; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1116; --surface: #171a22; --ink: #eceef4; --muted: #8e94a3; --bad: #f28b9c; --line: #242836; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 640px; margin: 10vh auto; padding: 0 16px; }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--bad); font-size: 13px; }
+  p { color: var(--muted); }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <div class="box">
+    <h1>Something went wrong</h1>
+    <pre>{{ message }}</pre>
+    <p>Nothing you entered was lost. The full error is in the log at <code>{{ log_path }}</code>.</p>
+    <p><a href="/">Back to the dashboard</a></p>
+  </div>
+</main>
+</body>
+</html>

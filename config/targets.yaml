@@ -1,0 +1,273 @@
+# ===========================================================================
+# Shipped defaults for the job-targeting rules.
+#
+# You normally change these on the dashboard's Filters page, which saves your
+# values to data/profile/targets.yaml and layers them over this file. Editing
+# this file directly changes the defaults for everyone using the repo.
+# ===========================================================================
+
+compensation:
+  # Hard floors. Jobs estimated below these are dropped before any LLM call.
+  india_min_ctc_lpa: 45          # ₹45L total comp
+  us_remote_min_usd: 120000      # $120k base
+  # Tier-1 companies with no published comp still pass, marked comp:estimated.
+  pass_unknown_comp_at_tier: 1
+  # Salaries posted in dollars for an India role are converted at this rate.
+  usd_to_inr: 85
+
+level:
+  # Direct matches - titles that fit early-career experience outright.
+  direct_titles:
+    - "software engineer"
+    - "software development engineer"
+    - "sde 1"
+    - "sde i"
+    - "engineer i"
+    - "engineer 1"
+    - "associate software engineer"
+    - "new grad"
+    - "early career"
+    - "backend engineer"
+    - "frontend engineer"
+    - "full stack engineer"
+  # Stretch - reach roles that often still hire at ~1-2 yrs.
+  stretch_titles:
+    - "sde 2"
+    - "sde ii"
+    - "software engineer ii"
+    - "engineer ii"
+    - "senior software engineer"    # only survives if max_years_required passes
+  # AI/ML track - scored on JD fit, not title convention. RAG /
+  # agent-platform / tool-calling work is the differentiator here.
+  ai_track_titles:
+    - "ai engineer"
+    - "ml engineer"
+    - "machine learning engineer"
+    - "applied ai"
+    - "applied ml"
+    - "applied scientist"
+    - "forward deployed engineer"
+    - "member of technical staff"
+    - "agents engineer"
+    - "llm engineer"
+    - "genai engineer"
+    - "generative ai engineer"
+  # Hard rejects regardless of anything else.
+  reject_titles:
+    - "staff"
+    - "principal"
+    - "director"
+    - "manager"
+    - "architect"
+    - "vp "
+    - "head of"
+    - "intern"
+    - "contract"
+  # Highest numeric ladder rung to accept. "Software Engineer 3" and "SDE III"
+  # are the same thing; both are two rungs above an early-career candidate.
+  max_level_number: 2
+  max_years_required: 3          # drop JDs demanding more than this
+  phd_required_is_reject: true
+
+work_authorization:
+  # 3-way classifier. Only `us_only_no_sponsorship` is dropped.
+  india_eligible_patterns:
+    - "bangalore"
+    - "bengaluru"
+    - "hyderabad"
+    - "india"
+    - "remote - worldwide"
+    - "remote (worldwide)"
+    - "remote, worldwide"
+    - "remote - global"
+    - "work from anywhere"
+    - "anywhere in the world"
+    - "employer of record"
+    - "deel"
+    - "remote.com"
+  sponsorship_offered_patterns:
+    - "visa sponsorship"
+    - "will sponsor"
+    - "we sponsor"
+    - "sponsorship available"
+    - "sponsorship is available"
+    - "h-1b"
+    - "h1b"
+    - "cap-exempt"
+    - "relocation assistance"
+    - "relocation provided"
+    - "immigration support"
+  us_only_patterns:
+    - "must be authorized to work in the united states without sponsorship"
+    - "without the need for sponsorship"
+    - "not able to sponsor"
+    - "unable to sponsor"
+    - "no visa sponsorship"
+    - "cannot provide sponsorship"
+    - "us citizens only"
+    - "u.s. citizens only"
+    - "green card holders"
+    - "must be a us citizen"
+    - "security clearance"
+  # US posting with no sponsorship language either way -> send to Analyst
+  # rather than silently dropping a potentially sponsoring role.
+  ambiguous_goes_to_analyst: true
+
+scoring:
+  # Calibrated on 60 live scores. The distribution is bimodal: a cluster at
+  # 3.75-4.1 of genuinely applicable roles, then a clear quality drop-off
+  # below 3.0. 4.0 passed only 7% and discarded the Bangalore GitLab/Rubrik
+  # roles; 3.5 reached into real skill mismatches.
+  apply_threshold: 3.7           # >= this auto-proceeds to tailoring
+  # The 3.7-4.0 band is not weaker jobs - it is mostly *stretch* roles. Those
+  # lose points almost entirely on level_realism (2.92 vs 3.76 above the bar)
+  # while scoring HIGHER on pay and company quality. A stretch application
+  # costs one tailored resume, and a referral is exactly what closes a level
+  # gap, so they are worth surfacing rather than hiding.
+  queue_band: [3.7, 4.1]         # inside this band, always ask first
+  archive_below: 4.0             # archived WITH a written reason
+  # Jobs the AI scores per "Find jobs" run, best bets first. Five jobs per AI
+  # call, so 40 is 8 calls. Raise it to clear a backlog faster.
+  per_run: 40
+
+autonomy:
+  # Every row is a switch. Start conservative, loosen as trust builds.
+  auto_submit_clean_ats: true    # greenhouse/ashby/lever, no free-text
+  # Free-text questions are written by the Writer and fact-checked. This gate
+  # covers the residue: questions it could not answer from profile facts.
+  auto_submit_with_essays: false
+  write_cover_letter: true       # generate and attach one per application
+  auto_submit_workday: false
+  auto_submit_unknown_ats: false
+  linkedin_dm: queue             # queue | auto  (queue strongly recommended)
+  cold_email: queue
+  auto_followups: true           # d+3 and d+7, auto-stop on any reply
+  # MASTER SWITCH ("practice mode" on the Filters page). On means the
+  # unattended runs fill forms and screenshot them but never submit or send.
+  # Off means the evening run submits on its own, to clean Greenhouse/Ashby/
+  # Lever forms only, within applications_per_day and the per-company cap.
+  # Anything with an unanswered required field, an essay the Writer could not
+  # ground in profile facts, a Workday form or an unknown ATS still queues.
+  # New installs start on; switch it off once you trust the results.
+  shadow_mode: true
+
+limits:
+  # Live applications allowed at one company at a time. 40 of the 55
+  # India-eligible roles above the bar are Amazon, and they all land in the
+  # same ATS in front of the same recruiting org - forty applications reads as
+  # volume, not interest. The best few by score get the tailored resume; the
+  # rest wait until one resolves. 0 = unlimited.
+  applications_per_company: 4
+  cold_emails_per_day: 15
+  linkedin_profile_views_per_run: 40
+  linkedin_searches_per_run: 15
+  applications_per_day: 25
+  referral_sla_hours: 24
+
+schedule:
+  # Runs daily while the dashboard is running. Switch on from the Runs page.
+  enabled: false
+  morning: "09:00"               # source -> score -> tailor -> draft referrals
+  evening: "18:30"               # referral sweep -> apply -> outreach -> digest
+  timezone: "Asia/Kolkata"
+
+resume:
+  # What goes out with each application:
+  #   tailored - a resume rewritten per job from your profile (reordered and
+  #              rephrased, fact-checked; one AI call per job)
+  #   original - your own uploaded resume PDF, exactly as it is
+  # Set on the Filters page, which also takes the PDF upload.
+  mode: tailored
+
+# Where to look beyond company career boards. Editable on the Filters page.
+sources:
+  linkedin:
+    # LinkedIn's public (logged-out) job search - never your signed-in
+    # account. Slow and capped per run on purpose.
+    enabled: true
+    location: India
+    keywords:
+      - software engineer
+      - software development engineer
+      - SDE 1
+      - backend engineer
+      - full stack engineer
+      - AI engineer
+      - machine learning engineer
+      - GenAI engineer
+    experience_levels: "2,3"      # LinkedIn: 2 entry, 3 associate
+    posted_within_days: 7
+    pages_per_query: 4            # 10 jobs a page
+    # Companies whose own careers site cannot be read directly. Searched by
+    # name first, before the general keywords, so they are never crowded out.
+    watch_companies:
+      - Zepto
+      - Swiggy
+      - Zomato
+      - Blinkit
+      - Nutanix
+      - Flipkart
+      - Myntra
+      - PhonePe
+      - Zerodha
+      - Dream11
+      - Atlassian
+      - Uber
+      - Google
+      - Microsoft
+      - Razorpay
+      - CRED
+      - Groww
+      - Meesho
+      - ShareChat
+      - Games24x7
+      - Juspay
+      - Urban Company
+      - Rapido
+      - Nykaa
+    pages_per_company: 2
+    max_postings: 150             # full postings read per run
+  wellfound:
+    # Startup jobs, often with the salary range.
+    enabled: true
+    location: india
+    roles:
+      - software-engineer
+      - backend-engineer
+      - full-stack-engineer
+      - machine-learning-engineer
+      - artificial-intelligence-engineer
+    pages_per_role: 3
+
+# Never show jobs from these companies (matched as whole words). IT services
+# and staffing firms flood general job searches at pay far below most floors.
+skip_companies:
+  - TCS
+  - Tata Consultancy Services
+  - Infosys
+  - Wipro
+  - HCLTech
+  - HCL Technologies
+  - Cognizant
+  - Accenture
+  - Capgemini
+  - Tech Mahindra
+  - LTIMindtree
+  - Mphasis
+  - Hexaware
+  - Coforge
+  - Birlasoft
+  - Zensar
+  - Persistent Systems
+  - NTT DATA
+  - DXC Technology
+  - Genpact
+  - Virtusa
+  - UST
+  - Cyient
+  - Randstad
+  - TeamLease
+  - Adecco
+  - ManpowerGroup
+  - Quess
+  - Collabera

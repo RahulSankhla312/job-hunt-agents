@@ -1,0 +1,18 @@
+{#- Wizard progress (first run only), then any notice or validation errors. -#}
+{% if onboarding %}
+<ol class="steps" aria-label="Setup progress">
+  {% set ns = namespace(passed=true) %}
+  {% for key, label in steps %}
+    {% if key == step %}{% set ns.passed = false %}<li class="on" aria-current="step">{{ loop.index }}. {{ label }}</li>
+    {% elif ns.passed %}<li class="done">&#10003; {{ label }}</li>
+    {% else %}<li>{{ loop.index }}. {{ label }}</li>{% endif %}
+  {% endfor %}
+</ol>
+{% endif %}
+{% if notice %}<div class="notice" role="status">{{ notice }}</div>{% endif %}
+{% if errors %}
+<ul class="errors" role="alert">
+  <li class="errors-head">Please fix {{ "this" if errors|length == 1 else "these" }}:</li>
+  {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+</ul>
+{% endif %}

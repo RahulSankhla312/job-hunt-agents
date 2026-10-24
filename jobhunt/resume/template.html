@@ -1,0 +1,175 @@
+<!--
+  Resume template, transcribed from an Overleaf LaTeX source.
+
+  The LaTeX is the specification; this reproduces it rather than approximating
+  it. The details that were wrong when this was eyeballed from a PDF:
+
+    * \documentclass[letterpaper,11pt] - body is 10.95pt, not 10pt
+    * \titlerule[2pt] in light-grey (gray 0.83) under each section heading,
+      not a hairline black rule
+    * \definecolor{text-grey}{gray}{.08} for body text, and dark-grey
+      (gray 0.3) for the right-hand dates and locations
+    * \usepackage{tgheros} with \familydefault{\sfdefault} - TeX Gyre Heros is
+      a Helvetica clone, so the web stack is Helvetica/Arial
+    * \texttt{} in the heading block means the contact line is FiraMono
+    * TECH STACK is a \resumeItem - a bullet inside the list, bold label and
+      ordinary body text, not a separate monospace line
+    * \textbf{CPI: 8.3} - the grade is bold
+    * \raggedright - never justified
+
+  ATS constraints are unchanged and still load-bearing:
+    * one column, normal document flow - multi-column layouts get read across
+      the page, interleaving unrelated lines
+    * no <table> for layout - many parsers flatten tables unpredictably
+    * no images, icons or web fonts - they carry no text and can drop content
+    * real <h2> section headings with conventional names, so sections are found
+    * dates in the same block as their heading, never in a floated sidebar
+-->
+<meta charset="utf-8" />
+<title>{{ profile.identity.name }} - Resume</title>
+<style>
+  /* \addtolength{\oddsidemargin}{-0.5in} + \textwidth{1in} => 0.5in sides. */
+  @page { size: letter; margin: {{ density.margin }}; }
+  * { box-sizing: border-box; }
+  :root {
+    --text-grey: #141414;   /* \definecolor{text-grey}{gray}{.08}  */
+    --dark-grey: #4d4d4d;   /* \definecolor{dark-grey}{gray}{0.3}  */
+    --light-grey: #d4d4d4;  /* \definecolor{light-grey}{gray}{0.83} */
+  }
+  body {
+    font-family: "TeX Gyre Heros", Helvetica, Arial, "Liberation Sans", sans-serif;
+    font-size: {{ density.font }}pt;
+    line-height: {{ density.line }};
+    color: var(--text-grey);
+    margin: 0;
+    text-align: left;       /* \raggedright */
+  }
+
+  /* \textbf{\Huge Your Name}, centred. */
+  h1 {
+    font-size: {{ density.name }}pt;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 5pt;
+    letter-spacing: -0.2px;
+  }
+  /* \small \texttt{...} - FiraMono, centred, pipe separated. */
+  .contact {
+    font-family: "Fira Mono", "DejaVu Sans Mono", Consolas, monospace;
+    font-size: {{ density.small }}pt;
+    text-align: center;
+    margin-bottom: 14pt;
+  }
+  .contact .sep { padding: 0 4pt; }
+
+  /* \titleformat{\section}: bold \large, then \titlerule[2pt] in light-grey. */
+  h2 {
+    font-size: {{ density.heading }}pt;
+    font-weight: 700;
+    /* The source writes them out in caps: \section{EDUCATION}. Done here so
+       the headings stay readable in the markup and in SECTION_ORDER, which is
+       matched case-insensitively against the extracted text. */
+    text-transform: uppercase;
+    margin: {{ density.section_gap }}pt 0 4pt;
+    padding-bottom: 2pt;
+    border-bottom: 2pt solid var(--light-grey);
+  }
+
+  /* \resumeSubheading: two rows, each left item / right item. */
+  .entry { margin-bottom: {{ density.gap }}pt; }
+  .entry-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12pt;
+  }
+  .role { font-weight: 700; }
+  .org { font-style: italic; }
+  .meta {
+    color: var(--dark-grey);
+    font-size: {{ density.small }}pt;
+    white-space: nowrap;
+  }
+  .meta strong { font-weight: 700; }
+
+  ul { margin: 3pt 0 0; padding-left: 16pt; }
+  li { margin-bottom: {{ density.bullet_gap }}pt; }
+  .label { font-weight: 700; }
+
+  p { margin: 0 0 4pt; }
+  .inline { margin: 0 0 2pt; }
+
+  /* Never split an entry across pages - a parser reading the second page
+     would attribute orphaned bullets to the wrong employer. */
+  .entry, li { break-inside: avoid; page-break-inside: avoid; }
+</style>
+
+<h1>{{ profile.identity.name }}</h1>
+<div class="contact">
+  {#- The source labels the profile links rather than printing the URLs. -#}
+  {%- set bits = [] -%}
+  {%- if profile.identity.phone %}{% set _ = bits.append(profile.identity.phone) %}{% endif -%}
+  {%- if profile.identity.email %}{% set _ = bits.append(profile.identity.email) %}{% endif -%}
+  {%- if profile.identity.github %}{% set _ = bits.append("GitHub") %}{% endif -%}
+  {%- if profile.identity.linkedin %}{% set _ = bits.append("LinkedIn") %}{% endif -%}
+  {%- for bit in bits %}{{ bit }}{% if not loop.last %}<span class="sep">|</span>{% endif %}{% endfor -%}
+</div>
+
+<h2>Education</h2>
+{% for edu in profile.education %}
+<div class="entry">
+  <div class="entry-head">
+    <div><span class="role">{{ edu.institution }}</span></div>
+    <div class="meta">{{ edu.start }}{% if edu.end %} &ndash; {{ edu.end }}{% endif %}</div>
+  </div>
+  <div class="entry-head">
+    <div><span class="org">{{ edu.degree }}{% if edu.field %} in {{ edu.field }}{% endif %}</span></div>
+    {# \textbf{CPI: 8.3} - bold in the source. #}
+    <div class="meta">{% if edu.grade %}<strong>{{ edu.grade }}</strong>{% endif %}</div>
+  </div>
+</div>
+{% endfor %}
+
+<h2>Skills</h2>
+{%- set all_skills = (skills.languages or []) + (skills.frameworks or [])
+                     + (skills.tools or []) + (skills.domains or []) %}
+{% if all_skills %}<p class="inline"><span class="label">Technical Skills</span> : {{ all_skills | join(", ") }}</p>{% endif %}
+
+<h2>Work Experience</h2>
+{% for job in experience %}
+<div class="entry">
+  <div class="entry-head">
+    <div><span class="role">{{ job.title }}</span></div>
+    <div class="meta">{{ job.start }}{% if job.end %} &ndash; {{ job.end }}{% endif %}</div>
+  </div>
+  <div class="entry-head">
+    <div><span class="org">{{ job.company }}</span></div>
+    <div class="meta">{{ job.location }}</div>
+  </div>
+  <ul>
+    {% for bullet in job.bullets %}<li>{{ bullet }}</li>{% endfor %}
+    {# In the source this is a \resumeItem, i.e. another bullet in the list. #}
+    {% if job.tech %}<li><span class="label">TECH STACK:</span> {{ job.tech | join(", ") }}</li>{% endif %}
+  </ul>
+</div>
+{% endfor %}
+
+{% if achievements %}
+<h2>Achievements</h2>
+<ul>
+  {% for item in achievements %}<li>{{ item }}</li>{% endfor %}
+</ul>
+{% endif %}
+
+{% if projects %}
+<h2>Projects</h2>
+{% for project in projects %}
+<div class="entry">
+  <div><span class="role">{{ project.name | upper }}</span>{% if project.tech %}
+    <span class="sep">|</span> <span class="org">{{ project.tech | join(", ") }}</span>{% endif %}</div>
+  <ul>
+    {% for bullet in project.bullets %}<li>{{ bullet }}</li>{% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{% endif %}

@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{% block title %}Job Hunt{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Tokens sampled from talent.micro1.ai/jobs/applied: Outfit, #F5F4F8 ground,
+     white sidebar, indigo #3444DA, and its signature card construction - a
+     white 8px panel inside a 4px lavender #E1E3F9 frame. */
+  :root {
+    --brand: #3444da; --brand-press: #2a35ae;
+    --lav: #e1e3f9; --lav-soft: #eef0fe;
+    --bg: #f5f4f8; --surface: #ffffff; --surface-2: #f5f4f8;
+    --ink: #2a2b2f; --ink-2: #55555e; --muted: #5c5b67;
+    --line: #d9d9e7; --line-soft: #e8e8f2;
+    --good: #12805c; --good-bg: #e8f8f1;
+    --warn: #b28b00; --warn-bg: #fffce2;
+    --bad: #d9455f;  --bad-bg: #fdf1f3;
+    --sidebar: 224px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --brand: #9aa2ff; --brand-press: #b3b9ff;
+      --lav: #262a42; --lav-soft: #1d2033;
+      --bg: #0f1116; --surface: #171a22; --surface-2: #1d212b;
+      --ink: #eceef4; --ink-2: #b4bac7; --muted: #8e94a3;
+      --line: #2b3040; --line-soft: #242836;
+      --good: #4dc79a; --good-bg: #10241c;
+      --warn: #e0b341; --warn-bg: #241e0b;
+      --bad: #f28b9c;  --bad-bg: #2a1419;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 400 15px/1.55 Outfit, ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  /* ---------------- sidebar ---------------- */
+  .shell { display: flex; min-height: 100%; }
+  .side {
+    width: var(--sidebar); flex: 0 0 var(--sidebar); background: var(--surface);
+    border-right: 1px solid var(--line-soft); padding: 22px 14px 14px;
+    display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+  }
+  .wordmark {
+    font-size: 23px; font-weight: 700; letter-spacing: -.7px; color: var(--ink);
+    text-decoration: none; padding: 0 10px; margin-bottom: 28px; display: block;
+  }
+  .wordmark i { color: var(--brand); font-style: normal; }
+  .side nav { display: flex; flex-direction: column; gap: 2px; }
+  .side nav a {
+    display: flex; align-items: center; gap: 11px; text-decoration: none;
+    color: var(--ink-2); font-size: 14.5px; font-weight: 400;
+    padding: 10px 12px; border-radius: 9px;
+  }
+  .side nav a:hover { background: var(--bg); color: var(--ink); }
+  .side nav a.on { background: var(--bg); color: var(--ink); font-weight: 500; }
+  .side nav a svg { width: 17px; height: 17px; flex: 0 0 17px; stroke-width: 1.7; }
+  .side nav a .n {
+    margin-left: auto; font-size: 11.5px; font-weight: 500; color: var(--brand);
+    background: var(--lav-soft); border-radius: 999px; padding: 1px 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .side .who {
+    margin-top: auto; display: flex; align-items: center; gap: 10px;
+    padding: 12px 10px 4px; border-top: 1px solid var(--line-soft); font-size: 14px;
+  }
+  .who .dot {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--lav);
+    color: var(--brand); display: grid; place-items: center;
+    font-size: 13px; font-weight: 600;
+  }
+  .who small { display: block; color: var(--muted); font-size: 11.5px; }
+
+  /* ---------------- main ---------------- */
+  .main { flex: 1; min-width: 0; padding: 26px 30px 70px; }
+  .page-head {
+    display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .page-head h1 { font-size: 24px; font-weight: 600; letter-spacing: -.3px; margin: 0; }
+  .page-head p { color: var(--muted); font-size: 14px; margin: 6px 0 0; max-width: 78ch; }
+  .grow { flex: 1; }
+
+  h2 { font-size: 16px; font-weight: 500; margin: 28px 0 12px; }
+  h2 .count { color: var(--muted); font-weight: 400; font-size: 14px; }
+
+  .banner {
+    background: var(--warn-bg); border: 1px solid var(--warn);
+    border-radius: 10px; padding: 11px 14px; margin-bottom: 20px; font-size: 13.5px;
+  }
+  .banner b { color: var(--warn); }
+
+  /* ---------------- tabs ---------------- */
+  .tabs {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 22px;
+    border-bottom: 1px solid var(--line-soft); padding-bottom: 0;
+  }
+  .tabs a {
+    text-decoration: none; font-size: 15px; color: var(--muted);
+    padding: 8px 14px; border-radius: 7px 7px 0 0; white-space: nowrap;
+  }
+  .tabs a:hover { color: var(--ink); }
+  .tabs a.on { background: var(--lav); color: var(--ink); font-weight: 500; }
+  .tabs a .n { font-size: 12px; opacity: .8; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+  /* ---------------- funnel strip ---------------- */
+  .funnel {
+    display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .funnel .step {
+    background: var(--surface); border: 1px solid var(--line-soft);
+    border-radius: 10px; padding: 10px 16px; min-width: 104px;
+  }
+  .funnel .step b {
+    display: block; font-size: 19px; font-weight: 600; line-height: 1.2;
+    font-variant-numeric: tabular-nums; color: var(--muted);
+  }
+  .funnel .step.live b { color: var(--brand); }
+  .funnel .step span { font-size: 11.5px; color: var(--muted); }
+  .funnel .arrow { color: var(--line); font-style: normal; align-self: center; }
+
+  .stage-row {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-soft);
+  }
+  .stage-row button { font-size: 12.5px; padding: 6px 13px; }
+
+  /* ---------------- stats ---------------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 10px; margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--line-soft);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .stat b {
+    display: block; font-size: 22px; font-weight: 600; line-height: 1.2;
+    letter-spacing: -.4px; font-variant-numeric: tabular-nums;
+  }
+  .stat span { color: var(--muted); font-size: 12px; }
+  .stat.hot b { color: var(--brand); }
+
+  /* ---------------- the micro1 card: lavender frame + white panel ------- */
+  .frame {
+    background: var(--lav); border-radius: 12px; padding: 4px; margin-bottom: 16px;
+    display: flex;
+  }
+  .frame > .panel {
+    background: var(--surface); border-radius: 8px; padding: 16px;
+    flex: 1; min-width: 0; display: flex; flex-direction: column;
+  }
+  /* Pushes the button row to the bottom so cards in a row line up. */
+  .frame > .panel > .actions { margin-top: auto; padding-top: 14px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; }
+  .grid2 .frame { margin-bottom: 0; }
+
+  .card-top {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .stamp { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 5px; }
+  .stamp svg { width: 13px; height: 13px; stroke-width: 2.4; color: var(--good); }
+  .stamp.pending svg { color: var(--muted); }
+  .stamp.pending { color: var(--muted); }
+  .badge {
+    font-size: 12px; font-weight: 500; border-radius: 4px; padding: 3px 7px;
+    white-space: nowrap;
+  }
+  .badge.review  { color: var(--warn); background: var(--warn-bg); }
+  .badge.pending { color: var(--bad);  background: var(--bad-bg); }
+  .badge.done    { color: var(--good); background: var(--good-bg); }
+  .badge.you     { color: var(--brand); background: var(--lav-soft); }
+  .badge.off     { color: var(--muted); background: var(--bg); }
+
+  .jtitle {
+    font-size: 16px; font-weight: 500; color: var(--ink); text-decoration: none;
+    display: block; line-height: 1.35;
+  }
+  .jtitle:hover { color: var(--brand); }
+  .jsub { font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+  .label { font-size: 11px; color: var(--ink-2); margin: 12px 0 6px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-size: 13px; color: var(--ink-2); border: 1px solid var(--line);
+    border-radius: 5px; padding: 5px 8px; background: var(--surface);
+    white-space: nowrap;
+  }
+  .chip.more { color: var(--muted); }
+
+  .score {
+    font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13px;
+    color: var(--brand); background: var(--lav-soft); border-radius: 5px;
+    padding: 2px 8px;
+  }
+  .score.mid { color: var(--warn); background: var(--warn-bg); }
+
+  /* pills used across the older views */
+  .pill {
+    display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 12.5px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .pill.good { color: var(--good); background: var(--good-bg); border-color: transparent; }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); border-color: transparent; }
+  .pill.bad  { color: var(--bad);  background: var(--bad-bg);  border-color: transparent; }
+  .pill.brand{ color: var(--brand); background: var(--lav-soft); border-color: transparent; }
+
+  .meta { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  .summary { margin-top: 9px; font-size: 13.5px; color: var(--ink-2); }
+
+  .blocked {
+    margin-top: 12px; padding: 10px 13px; border-radius: 8px;
+    background: var(--bad-bg); border: 1px solid var(--bad-line, var(--bad));
+    font-size: 13px; color: var(--ink-2);
+  }
+  .blocked b { color: var(--bad); display: block; margin-bottom: 2px; }
+  .blocked .hint { color: var(--muted); }
+
+  /* ---------------- controls ---------------- */
+  .actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  button, .btn {
+    font: inherit; font-size: 13.5px; font-weight: 400; padding: 8px 16px;
+    border-radius: 999px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink);
+    cursor: pointer; text-decoration: none; display: inline-block; white-space: nowrap;
+    transition: background .14s, border-color .14s, color .14s;
+  }
+  button:hover, .btn:hover { border-color: var(--muted); }
+  button.primary {
+    background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 500;
+  }
+  button.primary:hover { background: var(--brand-press); border-color: var(--brand-press); }
+  /* A link that carries the primary action, where a button would lie about
+     what happens - the real submit lives on the employer's own page. */
+  .btn.primary-link {
+    background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 500;
+  }
+  .btn.primary-link:hover { background: var(--brand-press); border-color: var(--brand-press); }
+  button.danger { color: var(--bad); }
+  button.danger:hover { background: var(--bad-bg); border-color: var(--bad); }
+  form.inline { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+  /* Lets a form's buttons sit in the same wrapped row as the links beside it,
+     instead of the form being one unbreakable flex item. */
+  .actions > form.inline { display: contents; }
+
+  textarea, input[type=text] {
+    width: 100%; font: inherit; font-size: 14px; padding: 10px 13px;
+    border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); margin-top: 10px;
+  }
+  textarea:focus, input[type=text]:focus {
+    outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--lav-soft);
+  }
+
+  /* ---------------- tables ---------------- */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--line-soft);
+    border-radius: 12px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--line-soft); }
+  thead th {
+    color: var(--muted); font-weight: 400; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .5px; background: var(--bg);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: var(--bg); }
+  td a { color: var(--ink); text-decoration: none; font-weight: 500; }
+  td a:hover { color: var(--brand); }
+  .scroll { overflow-x: auto; }
+
+  .empty {
+    color: var(--muted); padding: 40px 20px; text-align: center; font-size: 14px;
+    background: var(--surface); border: 1px dashed var(--line);
+    border-radius: 12px;
+  }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px;
+    background: var(--bg); border: 1px solid var(--line-soft);
+    padding: 1px 5px; border-radius: 4px;
+  }
+
+  /* ---------------- forms (setup, filters, connections) ---------------- */
+  .notice {
+    background: var(--good-bg); border: 1px solid var(--good); color: var(--ink);
+    border-radius: 10px; padding: 11px 14px; margin-bottom: 18px; font-size: 13.5px;
+  }
+  .errors {
+    background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 10px;
+    padding: 11px 14px 11px 32px; margin: 0 0 18px; font-size: 13.5px; color: var(--ink);
+  }
+  .errors li { margin: 2px 0; }
+  .errors-head { font-weight: 600; color: var(--bad); margin: 0 0 4px -18px; list-style: none; }
+  .section { margin-bottom: 18px; }
+  .section h2 { margin: 0 0 4px; font-size: 17px; font-weight: 600; }
+  .section .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; }
+  .fields {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px 16px;
+  }
+  .fields .wide { grid-column: 1 / -1; }
+  .field label, .field .lbl {
+    display: block; font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-bottom: 5px;
+  }
+  .field label .req { color: var(--bad); }
+  .field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .field input[type=text], .field input[type=email], .field input[type=tel],
+  .field input[type=url], .field input[type=number], .field input[type=time],
+  .field input[type=password], .field select, .field textarea {
+    width: 100%; font: inherit; font-size: 14px; padding: 9px 12px; margin: 0;
+    border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink);
+  }
+  .field textarea { min-height: 86px; resize: vertical; line-height: 1.45; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--lav-soft);
+  }
+  .check {
+    display: flex; gap: 10px; align-items: flex-start; font-size: 14px;
+    padding: 8px 0; cursor: pointer;
+  }
+  .check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+  .check small { display: block; color: var(--muted); font-size: 12.5px; }
+  .entry {
+    border: 1px solid var(--line-soft); border-radius: 10px; padding: 14px;
+    margin-bottom: 12px; background: var(--surface-2);
+  }
+  .entry-head { display: flex; align-items: center; margin-bottom: 10px; gap: 8px; }
+  .entry-head b { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .entry-head button { margin-left: auto; font-size: 12.5px; padding: 5px 12px; }
+  .savebar {
+    position: sticky; bottom: 0; z-index: 5; margin-top: 18px;
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 12px;
+    padding: 12px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, .06);
+  }
+  .savebar .grow { flex: 1; }
+  .savebar small { color: var(--muted); }
+  .steps {
+    display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 20px; padding: 0; list-style: none;
+  }
+  .steps li {
+    font-size: 13px; color: var(--muted); padding: 6px 12px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line-soft);
+  }
+  .steps li.done { color: var(--good); }
+  .steps li.on { color: var(--brand); border-color: var(--brand); font-weight: 500; }
+  .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 14px; font-size: 13.5px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; overflow-wrap: anywhere; }
+  .dot-live {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--good); margin-right: 6px; vertical-align: middle;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .state { font-size: 12.5px; font-weight: 500; border-radius: 5px; padding: 3px 8px; white-space: nowrap; }
+  .state.ok { color: var(--good); background: var(--good-bg); }
+  .state.bad { color: var(--bad); background: var(--bad-bg); }
+  .state.idle { color: var(--muted); background: var(--bg); }
+  .state.busy { color: var(--brand); background: var(--lav-soft); }
+  .filterbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 18px; }
+  .filterbar input[type=text], .filterbar input[type=number] { width: auto; flex: 1 1 180px; margin: 0; }
+  .filterbar input.narrow { flex: 0 1 130px; }
+  .filterbar input[type=file] { flex: 1 1 220px; min-width: 0; font-size: 13px; }
+  .filterbar .check { padding: 0; }
+  #exp-list, #edu-list, #proj-list { counter-reset: entry; }
+  .entry { counter-increment: entry; }
+  .entry-head b::after { content: " " counter(entry); }
+  .side nav .sep { height: 1px; background: var(--line-soft); margin: 8px 10px; }
+  .who a { text-decoration: none; }
+  button[disabled] { opacity: .5; cursor: not-allowed; }
+
+  @media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .side {
+      width: 100%; flex: none; height: auto; position: static; flex-direction: row;
+      align-items: center; gap: 10px; padding: 10px 14px; overflow-x: auto;
+      border-right: 0; border-bottom: 1px solid var(--line-soft);
+    }
+    .wordmark { margin: 0; padding: 0; font-size: 19px; }
+    .side nav { flex-direction: row; gap: 2px; }
+    .side nav a { padding: 7px 11px; font-size: 14px; }
+    .side nav a svg, .side .who { display: none; }
+    .main { padding: 18px 14px 60px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .actions button, .actions .btn { flex: 1 1 auto; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="wordmark" href="/">jobhunt<i>.</i></a>
+    <nav>
+      {% set path = request.url.path %}
+      {% if setup_done %}
+      <a href="/" class="{% if path == '/' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Queue{% if counts.queued %}<span class="n">{{ counts.queued }}</span>{% endif %}
+      </a>
+      <a href="/applied" class="{% if path == '/applied' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 7H4a1 1 0 00-1 1v11a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        Applied{% if counts.applied %}<span class="n">{{ counts.applied }}</span>{% endif %}
+      </a>
+      <a href="/insights" class="{% if path == '/insights' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Insights
+      </a>
+      <a href="/pipeline" class="{% if path == '/pipeline' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+        Pipeline
+      </a>
+      <a href="/archive" class="{% if path == '/archive' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18v13H3z"/><path d="M3 7l2-3h14l2 3M10 12h4"/></svg>
+        Archive
+      </a>
+      <span class="sep"></span>
+      <a href="/runs" class="{% if path == '/runs' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 4l14 8-14 8z"/></svg>
+        Runs{% if run_state.running %}<span class="n"><span class="dot-live"></span>live</span>{% endif %}
+      </a>
+      <a href="/filters" class="{% if path == '/filters' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>
+        Filters
+      </a>
+      <a href="/setup" class="{% if path == '/setup' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        Profile
+      </a>
+      <a href="/connections" class="{% if path == '/connections' %}on{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>
+        Connections
+      </a>
+      {% else %}
+      <a href="/setup" class="on">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        Set up
+      </a>
+      {% endif %}
+    </nav>
+    <div class="who">
+      <span class="dot">{{ me.initials }}</span>
+      <span><a href="/setup">{{ me.name }}</a><small>{% if setup_done %}bar {{ threshold }}{% if shadow_mode %} · practice mode{% else %} · live{% endif %}{% else %}setting up{% endif %}</small></span>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% if shadow_mode and setup_done %}
+    <div class="banner">
+      <b>Shadow mode is on.</b> This is practice mode: nothing is submitted or sent
+      on its own &mdash; every action lands here for you to review. Switch to live
+      mode on the <a href="/filters#autonomy">Filters</a> page once you trust the results.
+    </div>
+    {% endif %}
+    {% block body %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

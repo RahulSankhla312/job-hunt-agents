@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Follow-up — {{ job.company }}{% endblock %}
+{% block body %}
+
+<div class="page-head">
+  <div>
+    <h1>Follow-up note</h1>
+    <p>{{ job.title }} at {{ job.company }} · after your {{ stage_label|lower }}</p>
+  </div>
+  <span class="grow"></span>
+  <a class="btn" href="/applied">Back to applied</a>
+</div>
+
+{% if written.ok %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top">
+      <span class="badge done">fact-checked</span>
+      <span class="badge off">{{ written.text.split()|length }} words</span>
+      {% if written.attempts > 1 %}
+        <span class="badge review">{{ written.attempts }} attempts</span>{% endif %}
+    </div>
+    <div style="white-space:pre-wrap;font-size:14px;line-height:1.65;margin-top:12px">{{ written.text }}</div>
+  </div>
+</div>
+{% else %}
+<div class="frame">
+  <div class="panel">
+    <div class="card-top"><span class="badge pending">not usable</span></div>
+    <div class="jsub" style="margin-top:10px">
+      {% if written.error %}{{ written.error }}
+      {% else %}The draft made claims that are not in your profile, so it was blocked:
+        <ul>{% for v in written.violations[:8] %}<li>{{ v }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<h2>Make it specific</h2>
+<div class="frame">
+  <div class="panel">
+    <div class="jsub">
+      A follow-up is only worth sending if it adds something. Paste what you
+      actually discussed — the problem they described, a question you fumbled,
+      a name — and redraft. Without notes it stays general, which is honest but
+      much weaker.
+    </div>
+    <form method="post" action="/application/{{ app.id }}/followup">
+      <textarea name="notes" rows="5"
+        placeholder="e.g. They asked how I handled duplicate API calls; I described the retry fix but not the scale. They mentioned they are rebuilding their CI pipeline.">{{ notes }}</textarea>
+      <div class="actions">
+        <button class="primary">Redraft with these notes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
