@@ -2,12 +2,12 @@
 
 Three layers:
   * :class:`Settings`          - environment/secrets and paths (from ``.env``).
-  * ``config/*.yaml``          - shipped defaults for the job-targeting rules.
+  * ``jobhunt/defaults/*.yaml`` - shipped defaults for the job-targeting rules.
   * ``<data>/profile/targets.yaml`` - your own overrides of those rules, written
     by the setup page. Deep-merged over the defaults.
 
 Keeping the targeting rules in YAML means retuning the funnel never requires a
-code change. Keeping *your* values out of ``config/`` means they are never
+code change. Keeping *your* values out of the defaults means they are never
 committed, and a ``git pull`` never fights with them.
 """
 
@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import copy
 import functools
+import os
 import threading
 from pathlib import Path
 from typing import Any
@@ -22,19 +23,28 @@ from typing import Any
 import yaml
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT = Path(__file__).resolve().parent.parent
-CONFIG = ROOT / "config"
+PACKAGE = Path(__file__).resolve().parent
+ROOT = PACKAGE.parent
+# Run from a git checkout, everything lives in the project folder. Installed
+# with pip or pipx, the package sits in site-packages, so your settings and
+# data go to ~/.hireloop instead (or wherever HIRELOOP_HOME points).
+CHECKOUT = (ROOT / "run.py").exists()
+HOME = Path(
+    os.environ.get("HIRELOOP_HOME") or (ROOT if CHECKOUT else Path.home() / ".hireloop")
+).expanduser()
+# The shipped job-targeting defaults, inside the package so installs get them.
+CONFIG = PACKAGE / "defaults"
 
 
 class Settings(BaseSettings):
     """Environment-backed settings. Secrets live here, never in YAML."""
 
     model_config = SettingsConfigDict(
-        env_file=ROOT / ".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=HOME / ".env", env_file_encoding="utf-8", extra="ignore"
     )
 
     # Where everything personal lives: database, profile, resumes, browser
-    # session. Relative paths are resolved against the project root.
+    # session. Relative paths are resolved against HOME.
     jobhunt_data_dir: str = "data"
     # Public demo: every action that changes something is switched off.
     jobhunt_read_only: bool = False
@@ -58,7 +68,7 @@ class Settings(BaseSettings):
     @property
     def data_dir(self) -> Path:
         p = Path(self.jobhunt_data_dir or "data").expanduser()
-        return p if p.is_absolute() else ROOT / p
+        return p if p.is_absolute() else HOME / p
 
     @property
     def db_path(self) -> Path:
@@ -127,7 +137,7 @@ def settings() -> Settings:
     return Settings()
 
 
-ENV_PATH = ROOT / ".env"
+ENV_PATH = HOME / ".env"
 
 
 def update_env(values: dict[str, str], path: Path | None = None) -> None:
@@ -156,6 +166,7 @@ def update_env(values: dict[str, str], path: Path | None = None) -> None:
             out.append(line)
     out.extend(render(k, v) for k, v in pending.items())
 
+    path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_text("\n".join(out) + "\n", encoding="utf-8")
     tmp.replace(path)
@@ -220,7 +231,7 @@ def _cached(name: str, files: tuple[Path, ...]) -> dict[str, Any]:
 
 
 def load_yaml(name: str) -> dict[str, Any]:
-    """Load ``config/<name>.yaml``. Returns ``{}`` if absent."""
+    """Load ``defaults/<name>.yaml``. Returns ``{}`` if absent."""
     return _cached(name, (CONFIG / f"{name}.yaml",))
 
 

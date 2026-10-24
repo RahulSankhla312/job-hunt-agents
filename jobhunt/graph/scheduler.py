@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from jobhunt.config import ROOT, targets
+from jobhunt.config import targets
 
 log = logging.getLogger(__name__)
 
@@ -150,7 +150,7 @@ def run_forever() -> None:
 
 
 def windows_task_command(command: str = "schedule") -> str:
-    """The schtasks command that starts ``run.py <command>`` at logon.
+    """The schtasks command that starts ``python -m jobhunt <command>`` at logon.
 
     Uses pythonw.exe next to the running interpreter, so it works for any
     virtualenv location and opens no console window.
@@ -158,8 +158,7 @@ def windows_task_command(command: str = "schedule") -> str:
     exe = Path(sys.executable)
     pythonw = exe.with_name("pythonw.exe")
     python = pythonw if pythonw.exists() else exe
-    runner = ROOT / "run.py"
     return (
-        'schtasks /Create /TN "JobHuntAgents" /SC ONLOGON /RL LIMITED /F '
-        f'/TR "\'{python}\' \'{runner}\' {command}"'
+        'schtasks /Create /TN "HireLoop" /SC ONLOGON /RL LIMITED /F '
+        f'/TR "\'{python}\' -m jobhunt {command}"'
     )

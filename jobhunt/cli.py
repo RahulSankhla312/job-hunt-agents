@@ -92,13 +92,13 @@ def doctor(
 
         t, c = targets(), company_tiers()
         if not t:
-            return False, "config/targets.yaml missing or empty"
+            return False, "jobhunt/defaults/targets.yaml missing or empty"
         floor = t["compensation"]["india_min_ctc_lpa"]
         n = len(c.get("companies", []))
         shadow = t["autonomy"]["shadow_mode"]
         return True, f"floor ₹{floor}L · {n} companies · shadow_mode={shadow}"
 
-    check("config/*.yaml", _config)
+    check("default settings", _config)
 
     # --- database --------------------------------------------------------
     def _db():
@@ -301,7 +301,7 @@ def discover(
     names: str = typer.Option("", "--names", help="Comma-separated company names."),
     from_file: str = typer.Option("", "--from-file", help="JSON list with a 'name' key each."),
     workday: bool = typer.Option(True, "--workday/--no-workday", help="Also brute-probe Workday."),
-    append: bool = typer.Option(False, "--append", help="Append hits to config/company_tiers.yaml."),
+    append: bool = typer.Option(False, "--append", help="Append hits to jobhunt/defaults/company_tiers.yaml."),
 ) -> None:
     """Find which ATS hosts a company's board, and under what slug."""
     import json
@@ -404,7 +404,7 @@ def gate(
     limit: int = typer.Option(0, "--limit", help="Only process this many jobs."),
     dry_run: bool = typer.Option(False, "--dry-run"),
     reset: bool = typer.Option(
-        False, "--reset", help="Re-filter every job. Use after editing config/targets.yaml."
+        False, "--reset", help="Re-filter every job. Use after changing the filters."
     ),
     audit: bool = typer.Option(
         False,

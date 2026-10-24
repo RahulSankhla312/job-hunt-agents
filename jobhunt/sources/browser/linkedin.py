@@ -7,7 +7,7 @@ and never submits anything - the Connector agent drafts, you send.
 That split is deliberate. LinkedIn's User Agreement prohibits automated
 activity, and your account is the most valuable asset in a job search; a
 restricted account costs far more than any referral is worth. Every hard limit
-below comes from `config/targets.yaml` and is enforced against a daily counter,
+below comes from `defaults/targets.yaml` and is enforced against a daily counter,
 not just hoped for.
 """
 

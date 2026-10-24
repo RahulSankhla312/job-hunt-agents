@@ -27,7 +27,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from sqlmodel import func, select
 
 from jobhunt.agents.analyst import MANUAL_REJECT_PREFIX
-from jobhunt.config import ROOT, profile_exists, settings, targets
+from jobhunt.config import HOME, profile_exists, settings, targets
 from jobhunt.store.db import init_db, session
 from jobhunt.store.models import (
     Application,
@@ -488,7 +488,7 @@ def screenshot(app_id: int):
     path = Path(row.screenshot_path)
     if not path.is_absolute():
         # Older rows stored "data/screenshots/..." relative to the project.
-        path = ROOT / path
+        path = HOME / path
     if not path.exists():
         return HTMLResponse("Screenshot file is missing", status_code=404)
     return FileResponse(path, media_type="image/png")
@@ -927,7 +927,7 @@ def handover_now(job_id: int):
     try:
         subprocess.Popen(
             [sys.executable, "-m", "jobhunt", "handover", "--job-id", str(job_id)],
-            cwd=str(ROOT),
+            cwd=str(HOME),
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         )
     except Exception as exc:  # noqa: BLE001

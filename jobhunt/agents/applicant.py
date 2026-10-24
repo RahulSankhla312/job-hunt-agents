@@ -1,6 +1,6 @@
 """Applicant - fill an ATS application form and, when it is safe to, submit it.
 
-The autonomy rules from ``config/targets.yaml`` are enforced here, and the
+The autonomy rules from ``defaults/targets.yaml`` are enforced here, and the
 default answer is "queue it for a human". A form is only submitted
 automatically when three things hold:
 

@@ -449,7 +449,7 @@ def run(*, limit: int | None = None, dry_run: bool = False) -> GateStats:
 def reset() -> int:
     """Return every gated/rejected job to unfiltered.
 
-    Needed whenever ``config/targets.yaml`` changes: the filters are only
+    Needed whenever ``defaults/targets.yaml`` changes: the filters are only
     tunable if their previous verdicts can be thrown away and recomputed.
     Jobs that have progressed past scoring are left alone.
     """

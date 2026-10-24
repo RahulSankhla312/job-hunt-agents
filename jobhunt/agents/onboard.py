@@ -2,7 +2,7 @@
 
 Parses the resume PDF, then fills the gaps a resume never contains (current
 CTC, notice period, work authorisation) by asking. Defaults come from
-``config/targets.yaml`` so the common path is just pressing Enter.
+``defaults/targets.yaml`` so the common path is just pressing Enter.
 """
 
 from __future__ import annotations

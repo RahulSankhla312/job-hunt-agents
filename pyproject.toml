@@ -43,12 +43,13 @@ dev = ["pytest>=8.3", "ruff>=0.8"]
 hireloop = "jobhunt.cli:main"
 jobhunt = "jobhunt.cli:main"
 
-# The app runs from its checkout: config/ and data/ live beside the package.
-# `pip install -e .` gives you the `jobhunt` command without moving anything.
+# From a checkout, data/ and .env live in the project folder; installed with
+# pip or pipx they live in ~/.hireloop. `pip install -e .` adds the command.
 [tool.setuptools.packages.find]
 include = ["jobhunt*"]
 
 [tool.setuptools.package-data]
+"jobhunt" = ["defaults/*.yaml"]
 "jobhunt.web" = ["templates/*.html"]
 "jobhunt.resume" = ["*.html"]
 "jobhunt.demo" = ["*.yaml"]

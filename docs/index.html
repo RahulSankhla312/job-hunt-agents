@@ -79,16 +79,14 @@
 
   <h2>Get started in three steps</h2>
   <ol class="steps">
-    <li><b>Install</b> (Python 3.11+):
-<pre><code>git clone https://github.com/RahulSankhla312/hireloop.git
-cd hireloop
-python -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt   # Windows: .venv\Scripts\python
-.venv/bin/python -m playwright install chromium</code></pre></li>
+    <li><b>Install</b> with one command. Windows (PowerShell):
+<pre><code>irm https://raw.githubusercontent.com/RahulSankhla312/hireloop/main/install.ps1 | iex</code></pre>
+      macOS / Linux:
+<pre><code>curl -fsSL https://raw.githubusercontent.com/RahulSankhla312/hireloop/main/install.sh | sh</code></pre></li>
     <li><b>Try the demo</b> with a made-up candidate and sample jobs, nothing to fill in:
-<pre><code>.venv/bin/python run.py demo</code></pre></li>
-    <li><b>Use it for real.</b> Start the dashboard, upload your resume once, set your filters, connect the AI engine (Claude Code or an Anthropic API key), and press <i>Find jobs now</i>:
-<pre><code>.venv/bin/python run.py web</code></pre></li>
+<pre><code>hireloop demo</code></pre></li>
+    <li><b>Use it for real.</b> Open HireLoop from the desktop shortcut or run <code>hireloop web</code>, upload your resume once,
+      set your filters, connect the AI engine (Claude Code or an Anthropic API key), and press <i>Find jobs now</i>.</li>
   </ol>
 
   <h2>A closer look</h2>

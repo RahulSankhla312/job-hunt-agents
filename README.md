@@ -26,7 +26,7 @@ and application-form requests themselves.
 
 ![The Queue: real jobs that passed the filters, scored for fit by the AI, waiting for a decision](docs/screenshots/queue.png)
 
-**Try it in two minutes, no setup:** `python run.py demo` opens the dashboard with
+**Try it in two minutes, no setup:** `hireloop demo` opens the dashboard with
 a made-up candidate and sample jobs. [Details below.](#try-the-demo-first)
 
 > **Who it is built for.** Software engineers based in **India**, looking at
@@ -74,8 +74,10 @@ Want to look around before setting anything up? [Try the demo.](#try-the-demo-fi
 After [installing](#install), run:
 
 ```bash
-python run.py demo
+hireloop demo
 ```
+
+(From a source checkout: `python run.py demo`.)
 
 It opens **http://127.0.0.1:8788** with a fictional candidate (Aarav Mehta) and a
 dozen sample jobs at invented companies, in every stage: waiting for your
@@ -84,7 +86,7 @@ decision, ready, applied, archived and filtered out. Click around freely:
 - The demo lives in its own `demo-data/` folder and is reset each time you start it.
   Your real profile, jobs and settings are never read or changed.
 - It starts in practice mode, so nothing is ever submitted or sent.
-- To use the app for real, stop the demo (`Ctrl+C`) and run `python run.py web`.
+- To use the app for real, stop the demo (`Ctrl+C`) and run `hireloop web`.
 
 ### Host a public demo
 
@@ -118,6 +120,32 @@ Optional extras, all connected from the dashboard:
 ---
 
 ## Install
+
+### One command
+
+**Windows** — open PowerShell and run:
+
+```powershell
+irm https://raw.githubusercontent.com/RahulSankhla312/hireloop/main/install.ps1 | iex
+```
+
+**macOS / Linux** — open a terminal and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/RahulSankhla312/hireloop/main/install.sh | sh
+```
+
+The installer checks for Python 3.11+, installs HireLoop in its own isolated
+environment with [pipx](https://pipx.pypa.io), sets up the browser it fills forms
+with, adds a **HireLoop** desktop shortcut on Windows, and opens the dashboard.
+After that, start it any time with the shortcut or `hireloop web`; update with
+`pipx upgrade hireloop`.
+
+Already have pipx? `pipx install git+https://github.com/RahulSankhla312/hireloop.git`
+does the same. An installed copy keeps your profile, jobs and settings in
+`~/.hireloop` (`%USERPROFILE%\.hireloop` on Windows); set `HIRELOOP_HOME` to put them elsewhere.
+
+### From source (to change the code)
 
 Open a terminal in the folder where you want the project.
 
@@ -261,7 +289,7 @@ board being down must not cost you the day's applications.
 
 | Kind | Sources |
 |---|---|
-| Company career boards | Greenhouse, Ashby, Lever, SmartRecruiters, Workday, Amazon — 170+ companies in `config/company_tiers.yaml`, including Swiggy, Razorpay, Paytm, Meesho, CRED, Freshworks, ServiceNow, Agoda and more |
+| Company career boards | Greenhouse, Ashby, Lever, SmartRecruiters, Workday, Amazon — 170+ companies in `jobhunt/defaults/company_tiers.yaml`, including Swiggy, Razorpay, Paytm, Meesho, CRED, Freshworks, ServiceNow, Agoda and more |
 | LinkedIn job posts | LinkedIn's public (logged-out) job search: your search terms across India, plus a **watch list** of companies whose careers site can't be read directly (Zepto, Zomato, Nutanix, Flipkart, PhonePe, …). Your LinkedIn account is never used for this. You apply to these on LinkedIn yourself. |
 | Wellfound | Indian startup jobs, often with the salary range |
 | Free feeds | Remotive, RemoteOK, Arbeitnow, We Work Remotely, HN "Who is hiring" |
@@ -338,11 +366,11 @@ You rarely need to touch files: the dashboard writes them. For reference:
 | File | What it holds | In git? |
 |---|---|---|
 | `.env` | AI engine, API key, data folder, optional Google search key | **No** |
-| `config/targets.yaml` | Shipped defaults for filters, limits and schedule | Yes |
-| `config/company_tiers.yaml` | Companies to watch, their ATS, pay bands | Yes |
-| `config/known_sponsors.yaml` | US employers that visibly sponsor visas | Yes |
+| `jobhunt/defaults/targets.yaml` | Shipped defaults for filters, limits and schedule | Yes |
+| `jobhunt/defaults/company_tiers.yaml` | Companies to watch, their ATS, pay bands | Yes |
+| `jobhunt/defaults/known_sponsors.yaml` | US employers that visibly sponsor visas | Yes |
 | `data/profile/profile.yaml` | Your profile (from the setup page) | **No** |
-| `data/profile/targets.yaml` | Your filter overrides, layered over `config/targets.yaml` | **No** |
+| `data/profile/targets.yaml` | Your filter overrides, layered over `jobhunt/defaults/targets.yaml` | **No** |
 | `data/jobs.db` | Every job, score, resume, application and run | **No** |
 | `data/resumes/`, `data/cover_letters/`, `data/screenshots/` | Generated files | **No** |
 | `data/playwright-profile/` | The signed-in browser session | **No** |
@@ -432,7 +460,7 @@ jobhunt/
   store/      SQLModel schema + SQLite
   web/        dashboard: app, onboarding, runs, connections, templates/
   util/       cross-process run lock
-config/       shipped defaults
+jobhunt/defaults/  shipped defaults
 tests/        pytest suite (fixtures/ holds a fictional profile)
 ```
 

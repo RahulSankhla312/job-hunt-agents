@@ -220,7 +220,7 @@ class RunLog(SQLModel, table=True):
 
 
 class RateLimit(SQLModel, table=True):
-    """Daily counters that enforce the caps in ``config/targets.yaml``."""
+    """Daily counters that enforce the caps in ``defaults/targets.yaml``."""
 
     __tablename__ = "rate_limit"
 
