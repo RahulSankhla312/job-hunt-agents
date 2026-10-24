@@ -22,7 +22,7 @@ Your resume, profile, applications and account sessions stay on your machine.
 The only things sent anywhere are the AI calls (to Claude) and the job-board
 and application-form requests themselves.
 
-![The Queue: jobs that passed your filters, scored for fit, waiting for your decision](docs/screenshots/queue.png)
+![The Queue: real jobs that passed the filters, scored for fit by the AI, waiting for a decision](docs/screenshots/queue.png)
 
 **Try it in two minutes, no setup:** `python run.py demo` opens the dashboard with
 a made-up candidate and sample jobs. [Details below.](#try-the-demo-first)
@@ -56,11 +56,14 @@ a made-up candidate and sample jobs. [Details below.](#try-the-demo-first)
 | | |
 |---|---|
 | ![Job detail with the score breakdown](docs/screenshots/job.png) | ![Applied jobs and where each one stands](docs/screenshots/applied.png) |
-| **Every score explained**: skill overlap, level, pay confidence, eligibility. | **Applied**: every application and where it stands, from review to offer. |
-| ![Job filters](docs/screenshots/filters.png) | ![Profile setup](docs/screenshots/setup.png) |
-| **Filters**: pay floor, titles, score bar, sources, schedule. All from the UI. | **Profile**: import your resume PDF once; every form answer comes from here. |
+| **Every score explained**: skill overlap, level, pay confidence, eligibility, and the resume sent. | **Applied**: every application and where it stands, from prepared to offer. |
+| ![Insights: the funnel and what converts](docs/screenshots/insights.png) | ![Runs: find, apply, re-filter and the daily schedule](docs/screenshots/runs.png) |
+| **Insights**: the funnel from 21k sourced jobs down to applications, and reply rates by source. | **Runs**: start a run, re-apply filters, rebuild resumes, or turn on the daily schedule. |
+| ![Job filters](docs/screenshots/filters.png) | |
+| **Filters**: pay floor, titles, score bar, sources, resume mode and live/practice mode, all from the UI. | |
 
-All screenshots come from the built-in demo: the candidate and every company are made up.
+These screenshots are from a real job search: live mode, Claude Code as the AI engine.
+Want to look around before setting anything up? [Try the demo.](#try-the-demo-first)
 
 ---
 
