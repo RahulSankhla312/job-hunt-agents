@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>{% block title %}Job Hunt{% endblock %}</title>
+<title>{% block title %}Dashboard{% endblock %} · HireLoop</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -404,7 +404,7 @@
 <body>
 <div class="shell">
   <aside class="side">
-    <a class="wordmark" href="/">jobhunt<i>.</i></a>
+    <a class="wordmark" href="/">hireloop<i>.</i></a>
     <nav>
       {% set path = request.url.path %}
       {% if setup_done %}
@@ -459,7 +459,15 @@
   </aside>
 
   <main class="main">
-    {% if shadow_mode and setup_done %}
+    {% if read_only %}
+    <div class="banner">
+      {% if request.query_params.get("read_only") %}<b>That button is switched off in this demo.</b>
+      {% else %}<b>Public demo.</b>{% endif %}
+      A made-up candidate and sample jobs, so you can look around. Nothing here can be changed,
+      run or sent. <a href="https://github.com/RahulSankhla312/hireloop#install">Install HireLoop</a>
+      to run it on your own job search.
+    </div>
+    {% elif shadow_mode and setup_done %}
     <div class="banner">
       <b>Shadow mode is on.</b> This is practice mode: nothing is submitted or sent
       on its own &mdash; every action lands here for you to review. Switch to live

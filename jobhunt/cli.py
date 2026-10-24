@@ -33,7 +33,7 @@ import typer  # noqa: E402
 from rich.console import Console  # noqa: E402
 from rich.table import Table  # noqa: E402
 
-app = typer.Typer(add_completion=False, help="Local AI job-hunt agent team.")
+app = typer.Typer(add_completion=False, help="HireLoop: your AI job-search team.")
 console = Console()
 
 
@@ -921,7 +921,9 @@ def web(
 
     log_path = _log("WARNING", kind="web")
     init_db()
-    if host != "127.0.0.1":
+    from jobhunt.config import settings
+
+    if host != "127.0.0.1" and not settings().jobhunt_read_only:
         console.print(
             "[yellow]Binding beyond localhost.[/] The database holds your full job "
             "search, including draft messages. Only do this on a network you trust."
@@ -940,8 +942,12 @@ def web(
 @app.command()
 def demo(
     port: int = typer.Option(8788, "--port"),
+    host: str = typer.Option("127.0.0.1", "--host", help="0.0.0.0 to serve it publicly."),
     data_dir: str = typer.Option(
         "demo-data", "--data-dir", help="Folder for the demo. Reset on every run."
+    ),
+    read_only: bool = typer.Option(
+        False, "--read-only", help="Switch off every button that changes something (public demo)."
     ),
     open_browser: bool = typer.Option(True, "--open/--no-open"),
 ) -> None:
@@ -949,16 +955,19 @@ def demo(
 
     Uses its own data folder, so your real profile and jobs are never touched.
     """
+    import os
     from pathlib import Path
 
     from jobhunt.demo import seed
 
+    if read_only:
+        os.environ["JOBHUNT_READ_ONLY"] = "1"
     folder = seed(Path(data_dir))
     console.print(
         f"[green]Demo data:[/] {folder}  [dim](made-up candidate and companies; "
         "practice mode, nothing is ever submitted)[/]"
     )
-    web(port=port, host="127.0.0.1", open_browser=open_browser)
+    web(port=port, host=host, open_browser=open_browser)
 
 if __name__ == "__main__":
     main()

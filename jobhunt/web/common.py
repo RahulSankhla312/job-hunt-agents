@@ -143,5 +143,6 @@ def ctx(**extra: Any) -> dict[str, Any]:
         "me": me(),
         "setup_done": profile_exists(),
         "run_state": runner.state,
+        "read_only": settings().jobhunt_read_only,
         **extra,
     }

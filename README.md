@@ -1,11 +1,11 @@
-# Job Hunt Agents
+# HireLoop
 
-[![CI](https://github.com/RahulSankhla312/job-hunt-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/RahulSankhla312/job-hunt-agents/actions/workflows/ci.yml)
+[![CI](https://github.com/RahulSankhla312/hireloop/actions/workflows/ci.yml/badge.svg)](https://github.com/RahulSankhla312/hireloop/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![Runs locally](https://img.shields.io/badge/runs-locally-green)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-A team of AI agents that runs your job search on your own computer. It finds
+**Your AI job-search team.** HireLoop runs your job search on your own computer. It finds
 openings, filters them by your rules, scores each one for fit, writes a
 tailored resume and cover letter, finds people who could refer you, fills in
 the application forms, and tracks the replies.
@@ -84,6 +84,19 @@ decision, ready, applied, archived and filtered out. Click around freely:
 - It starts in practice mode, so nothing is ever submitted or sent.
 - To use the app for real, stop the demo (`Ctrl+C`) and run `python run.py web`.
 
+### Host a public demo
+
+The repository ships a `Dockerfile` that serves this demo **read-only**: every
+button that would change, run or send something is switched off and says so.
+It is safe to put on the internet; your real HireLoop is not (it signs in to your
+accounts and has no login screen), so keep that on your own computer.
+
+- **Render (free):** in the Render dashboard choose *New → Blueprint* and pick
+  your fork. `render.yaml` sets everything up and redeploys on every push.
+  The free plan sleeps when idle, so the first visit after a while takes about a minute.
+- **Anywhere that runs a container** (Hugging Face Spaces, Koyeb, Fly.io):
+  build the `Dockerfile`; it listens on `$PORT`, or 7860 if that is not set.
+
 ---
 
 ## What you need
@@ -109,8 +122,8 @@ Open a terminal in the folder where you want the project.
 **Windows (PowerShell or Command Prompt)**
 
 ```bash
-git clone https://github.com/RahulSankhla312/job-hunt-agents.git
-cd job-hunt-agents
+git clone https://github.com/RahulSankhla312/hireloop.git
+cd hireloop
 python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 .venv\Scripts\python -m playwright install chromium
@@ -121,8 +134,8 @@ copy .env.example .env
 **macOS / Linux**
 
 ```bash
-git clone https://github.com/RahulSankhla312/job-hunt-agents.git
-cd job-hunt-agents
+git clone https://github.com/RahulSankhla312/hireloop.git
+cd hireloop
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m playwright install --with-deps chromium
@@ -134,8 +147,8 @@ The last command starts the dashboard at **http://127.0.0.1:8787** and opens it
 in your browser. Keep that terminal open while you use it; stop it with
 `Ctrl+C`.
 
-> Prefer a `jobhunt` command? `pip install -e .` inside the virtualenv adds
-> one (`jobhunt web`, `jobhunt doctor`, and so on). `python run.py ...` and
+> Prefer a `hireloop` command? `pip install -e .` inside the virtualenv adds
+> one (`hireloop web`, `hireloop doctor`, and so on). `python run.py ...` and
 > `python -m jobhunt ...` do exactly the same thing.
 
 ### Setting up the AI engine

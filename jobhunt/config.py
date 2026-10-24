@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     # Where everything personal lives: database, profile, resumes, browser
     # session. Relative paths are resolved against the project root.
     jobhunt_data_dir: str = "data"
+    # Public demo: every action that changes something is switched off.
+    jobhunt_read_only: bool = False
 
     # Browser for form filling and sign-in. Blank = Playwright's bundled
     # Chromium, falling back to installed Chrome, then Edge, if it cannot

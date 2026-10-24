@@ -20,7 +20,7 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse
@@ -53,8 +53,10 @@ async def _lifespan(_app: FastAPI):
     from jobhunt.graph.runner import runner
 
     init_db()
-    threading.Thread(target=_backfill_resumes, name="resume-backfill", daemon=True).start()
-    if targets().get("schedule", {}).get("enabled") and profile_exists():
+    read_only = settings().jobhunt_read_only
+    if not read_only:
+        threading.Thread(target=_backfill_resumes, name="resume-backfill", daemon=True).start()
+    if not read_only and targets().get("schedule", {}).get("enabled") and profile_exists():
         try:
             runner.start_scheduler()
         except Exception:  # noqa: BLE001 - the dashboard must come up regardless
@@ -75,7 +77,7 @@ def _backfill_resumes() -> None:
         log.exception("resume layout backfill failed")
 
 
-app = FastAPI(title="Job Hunt", docs_url=None, redoc_url=None, lifespan=_lifespan)
+app = FastAPI(title="HireLoop", docs_url=None, redoc_url=None, lifespan=_lifespan)
 
 
 def _manual_site(job: Job) -> str | None:
@@ -107,8 +109,13 @@ def _same_origin(request: Request) -> bool:
 
 @app.middleware("http")
 async def _guard(request: Request, call_next):
-    if request.method not in ("GET", "HEAD", "OPTIONS") and not _same_origin(request):
-        return PlainTextResponse("Cross-site request refused.", status_code=403)
+    if request.method not in ("GET", "HEAD", "OPTIONS"):
+        if settings().jobhunt_read_only:
+            # The public demo: show what a button does, never do it.
+            back = urlsplit(request.headers.get("referer") or "/").path or "/"
+            return RedirectResponse(f"{back}?read_only=1", status_code=303)
+        if not _same_origin(request):
+            return PlainTextResponse("Cross-site request refused.", status_code=403)
     path = request.url.path
     if not path.startswith(OPEN_PATHS) and not profile_exists():
         return RedirectResponse("/setup", status_code=303)

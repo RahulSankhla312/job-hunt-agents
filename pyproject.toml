@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jobhunt-agents"
+name = "hireloop"
 version = "1.0.0"
-description = "A local team of AI agents that finds, filters, scores and applies to jobs for you."
+description = "Your AI job-search team: finds roles across 170+ career sites and LinkedIn, scores each for fit, tailors your resume and fills the application."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -40,6 +40,7 @@ dependencies = [
 dev = ["pytest>=8.3", "ruff>=0.8"]
 
 [project.scripts]
+hireloop = "jobhunt.cli:main"
 jobhunt = "jobhunt.cli:main"
 
 # The app runs from its checkout: config/ and data/ live beside the package.

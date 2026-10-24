@@ -1,0 +1,12 @@
+# One-click public demo on Render's free plan: Dashboard -> New -> Blueprint,
+# pick this repository. Redeploys on every push to main.
+services:
+  - type: web
+    name: hireloop-demo
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      - key: JOBHUNT_READ_ONLY
+        value: "1"
